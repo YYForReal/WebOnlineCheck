@@ -1,24 +1,22 @@
 <template>
-  <el-form ref="AnswerFrom" :model="form" :rules="rules" label-position="left" label-width="0px" class="login-container">
-    <h3>提交答案</h3>
-
-    <el-form-item prop="questionId">
-      <el-select v-model="form.questionId" placeholder="请选择实验题目">
-        <el-option v-for="item in questionList" :key="item.questionId" :label="item.title"
-          :value="item.questionId" />
-      </el-select>
-    </el-form-item>
-
+  <el-form ref="AnswerFrom" :model="form" :rules="rules" class="login-container">
+    <h2>提交答案</h2>
+    <div class="inline-box">
+      <el-form-item prop="questionId">
+        <el-select v-model="form.questionId" placeholder="请选择实验题目">
+          <el-option v-for="item in questionList" :key="item.questionId" :label="item.title" :value="item.questionId" />
+        </el-select>
+      </el-form-item>
+      <el-form-item class="submit-btn-box">
+        <el-button type="primary" @click="handleSumbit" :loading="logining">提交</el-button>
+      </el-form-item>
+    </div>
     <el-form-item prop="content">
       <el-input class="html-text-box" type="textarea" v-model="form.content" auto-complete="off" resize="none"
         placeholder="在此输入html文本"></el-input>
     </el-form-item>
 
-    <el-form-item>
-      <el-button type="primary" @click="handleSumbit" :loading="logining">提交</el-button>
-    </el-form-item>
-
-    <MySubmitVue/>
+    <!-- <MySubmitVue /> -->
   </el-form>
 </template>
 
@@ -149,17 +147,37 @@ body {
   background: aquamarine;
 }
 
+h2,
+h3 {
+  margin: 18px 0;
+}
+
 .login-container {
-  width: 350px;
-  margin-left: 20%;
+  min-width: 350px;
+  text-align: center;
+  margin: 0 auto;
 }
 
 .html-text-box {
-  width: 500px;
-  height: 300px;
+  width: 70%;
+  min-width: 500px;
+  min-height: 400px;
 }
 
-.html-text-box >>> .el-textarea__inner{
-  height:300px;
+.html-text-box>>>.el-textarea__inner {
+  height: 400px;
 }
+
+.inline-box{
+  width:100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.submit-btn-box{
+  margin-left: 30px;
+}
+
 </style>
