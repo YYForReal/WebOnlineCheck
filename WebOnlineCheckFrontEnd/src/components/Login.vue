@@ -1,20 +1,20 @@
 <template>
-    <el-form ref="AccountFrom" :model="account" :rules="rules" label-position="left" label-width="0px"
-             class="login-container">
-      <h3>系统登录</h3>
-      <el-form-item prop="username">
-        <el-input type="text" v-model="account.username"  auto-complete="off" placeholder="姓名"></el-input>
-      </el-form-item>
-      <el-form-item prop="userid">
-        <el-input type="text" v-model="account.userid" auto-complete="off" placeholder="学号" @keyup.enter.native="handleLogin"></el-input>
-      </el-form-item>
-      <el-form-item>
+  <el-form ref="AccountFrom" :model="account" :rules="rules" label-width="0px" class="login-container">
+    <h3>系统登录</h3>
+    <el-form-item prop="username">
+      <el-input type="text" v-model="account.username" auto-complete="off" placeholder="姓名"></el-input>
+    </el-form-item>
+    <el-form-item prop="userid">
+      <el-input type="text" v-model="account.userid" auto-complete="off" placeholder="学号"
+        @keyup.enter.native="handleLogin"></el-input>
+    </el-form-item>
+    <el-form-item class="btn-box">
       <el-button type="primary" @click="handleLogin" :loading="logining">登录</el-button>
-        <el-button type="primary">
-          <router-link to="/" style="text-decoration:none; color:white">返回首页</router-link>
-        </el-button>
-      </el-form-item>
-    </el-form>
+      <el-button type="primary">
+        <router-link to="/" style="text-decoration:none; color:white">返回首页</router-link>
+      </el-button>
+    </el-form-item>
+  </el-form>
 </template>
 
 <script>
@@ -26,18 +26,18 @@ export default {
     return {
       logining: false,
       account: {
-        username: 'web123',
-        userid: 'web123'
+        username: '黄友艺',
+        userid: '2019152042'
       },
       /* 判断：如果用户没有输入用户名，提示“请输入账号”
         判断：如果用户没有输入密码，提示“请输入密码”用于表单验证 */
       rules: {
         username: [{
           required: true, message: '请输入姓名', trigger: 'blur'
-        } ],
+        }],
         userid: [{
           required: true, message: '请输入学号', trigger: 'blur'
-        } ]
+        }]
       },
       checked: true
     }
@@ -90,7 +90,7 @@ export default {
           var oMyForm = new FormData()
           oMyForm.append('userId', this.account.userid)
           oMyForm.append('username', this.account.username)
-          console.info(oMyForm)
+
           return oMyForm
         }]
       })
@@ -103,7 +103,6 @@ export default {
           var oMyForm = new FormData()
           oMyForm.append('userId', this.account.userid)
           oMyForm.append('username', this.account.username)
-          console.info(oMyForm)
           return oMyForm
         }]
       })
@@ -133,11 +132,25 @@ export default {
 </script>
 
 <style scoped>
-  body{
-    background: aquamarine;
-  }
-  .login-container{
-    width: 350px;
-    margin-left: 20%;
-  }
+body {
+  background: aquamarine;
+}
+
+h3 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.login-container {
+  width: 350px;
+  margin: 0 auto;
+}
+
+.btn-box{
+  width:100%;
+  display: flex;
+  justify-content: center;
+  align-items:center;
+
+}
 </style>

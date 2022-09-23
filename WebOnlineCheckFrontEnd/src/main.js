@@ -10,7 +10,9 @@ import store from './store/store'
 import axios from 'axios'
 
 Vue.prototype.axios = axios
-Vue.prototype.baseUrl = 'http://localhost:5520'
+
+// Vue.prototype.baseUrl = 'http://localhost:5520'
+Vue.prototype.baseUrl = 'http://118.31.165.150:5520'
 Vue.config.productionTip = false
 Vue.use(ElementUI)
 Vue.use(Vuex)

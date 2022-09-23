@@ -192,7 +192,6 @@ function changed () {
       diff[i] = diff[i + 1]
       diff[i + 1] = swap
     }
-    console.log(diff[i])
     var diffObj = diff[i]
     var content = diffObj.value
 

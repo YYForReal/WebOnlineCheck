@@ -5,7 +5,7 @@
       <el-form :inline="true" ref="questionForm" :model="form"  label-position="left" label-width="0px"
         class="question-container">
         <el-form-item prop="questionId" style="width:150px">
-          <el-select v-model="form.questionId" placeholder="请选择实验">
+          <el-select v-model="form.questionId" placeholder="请选择操作/实验">
             <el-option v-for="item in questionList" :key="item.questionId" :label="item.title"
               :value="item.questionId" />
           </el-select>
@@ -18,15 +18,19 @@
       </div>
     </div>
     <div class="right-bar">
-      <div class="one-box" v-for="item in answerList" :key="item.answerId">
+      <!-- <router-view></router-view> -->
+      <div v-if="scanType == 1" class="one-box" v-for="item in answerList" :key="item.answerId">
         <JudgeVue :answerId="item.answerId" :content="item.content" :score="item.score" :questionText="questionText"
         :userId="item.userId" :username="item.username"  @changeScore="changeScore" />
       </div>
+      <ScoreListVue v-if="scanType===0"/>
+
     </div>
   </div>
 </template>
 <script>
 import JudgeVue from './Judge.vue'
+import ScoreListVue from './ScoreList.vue'
 export default {
   name: 'Home',
   data () {
@@ -36,7 +40,8 @@ export default {
         questionId: null
       },
       questionList: [],
-      questionText: ''
+      questionText: '',
+      scanType: 0
     }
   },
   mounted () {
@@ -59,6 +64,10 @@ export default {
         method: 'get'
       }).then((res) => {
         this.questionList = res.data
+        this.questionList.unshift({
+          questionId: -1,
+          title: '查看学生分数'
+        })
       }).catch((err) => {
         console.log('search question: ', err)
       })
@@ -67,11 +76,6 @@ export default {
       for (let i = 0; i < this.answerList.length; i++) {
         if (this.answerList[i].answerId === answerId) {
           this.answerList[i].score = score
-          console.log('修改成功')
-          this.$message({
-            type: 'success',
-            message: '修改成功'
-          })
         }
       }
     }
@@ -81,6 +85,11 @@ export default {
   watch: {
     'form.questionId': {
       handler (newId) {
+        if (newId === -1) {
+          this.scanType = 0
+        } else {
+          this.scanType = 1
+        }
         this.questionList.forEach(element => {
           if (element.questionId === newId) {
             this.questionText = element.content
@@ -97,7 +106,7 @@ export default {
     }
   },
   components: {
-    JudgeVue
+    JudgeVue, ScoreListVue
   }
 }
 </script>

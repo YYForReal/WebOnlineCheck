@@ -1,5 +1,4 @@
 <template>
-
   <div class="judge-card">
     <div class="student-info-box">
       <el-form :inline="true" :model="formInline">
@@ -80,7 +79,6 @@ export default {
   },
   methods: {
     delHtmlTag (str) {
-      console.log('Judge:', str)
       // 去除所有箭头
       str = str.replace(/<[^>]+>/g, '')
       // 替换所有的转义符号
@@ -109,7 +107,6 @@ export default {
           diff[i] = diff[i + 1]
           diff[i + 1] = swap
         }
-        console.log(diff[i])
         var diffObj = diff[i]
         var newContent = diffObj.value
 
@@ -128,6 +125,21 @@ export default {
       this.showHtml()
     },
     onSubmit () {
+      if (this.account == null) {
+        this.$message({
+          type: 'error',
+          message: '请先登录',
+          showClose: true
+        })
+        return
+      } else if (this.isTeacher === false) {
+        this.$message({
+          type: 'error',
+          message: '老师才能改分呐',
+          showClose: true
+        })
+        return
+      }
       // TODO 改分
       this.axios({
         url: this.baseUrl + '/user/check',
@@ -136,7 +148,7 @@ export default {
           var oMyForm = new FormData()
           oMyForm.append('userId', this.account.userid)
           oMyForm.append('username', this.account.username)
-          console.info(oMyForm)
+
           return oMyForm
         }]
       }).then((res) => {
@@ -149,8 +161,7 @@ export default {
             showClose: true
           })
         }
-      }).catch((err) => {
-        console.log(err)
+      }).catch(() => {
         this.$message({
           type: 'error',
           message: '网络异常',
@@ -168,7 +179,7 @@ export default {
           oMyForm.append('score', this.formInline.newScore)
           oMyForm.append('userId', this.account.userid)
           oMyForm.append('username', this.account.username)
-          console.info(oMyForm)
+
           return oMyForm
         }]
       }).then((res) => {
@@ -258,12 +269,15 @@ export default {
   computed: {
     account () {
       return this.$store.state.account
+    },
+    isTeacher () {
+      return this.$store.state.isTeacher
     }
   }
 }
 </script>
 
-<style>
+<style scoped>
 .judge-card {
   /* justify-content: center; */
   /* align-items: center; */
@@ -277,7 +291,7 @@ export default {
   border: 1px dotted dodgerblue;
 }
 
-.table {
+.judge-card .table {
   flex-direction: row;
   display: -webkit-flex;
   display: flex;
@@ -286,52 +300,51 @@ export default {
   flex-wrap: wrap;
 }
 
-.student-info-box {
+.judge-card >>> .student-info-box {
   width: 100%;
   text-align: center;
   margin-top: 10px;
 }
 
-tr {
+.judge-card >>> tr {
   width: 100%;
 }
 
-tr td {
+.judge-card >>> tr td {
   width: 400px;
   border: 1px solid #000000e6;
   overflow-wrap: anywhere;
 }
 
-del {
+.judge-card >>> del {
   background: #ff0000bf;
   text-decoration: none;
 }
 
-ins {
+.judge-card >>> ins {
   background: #00ff22c7;
   text-decoration: none;
 }
 
-iframe {
+.judge-card >>> iframe {
   width: 100%;
   min-height: 100px;
   max-height: 400px;
   overflow: scroll;
 }
 
-.table-header {
+.judge-card >>> .table-header {
   height: 50px;
   line-height: 50px;
   text-align: center;
   background-color: rgba(0, 255, 255, 0.718);
 }
 
-.table-one-header {
+.judge-card >>> .table-one-header {
   height: 38px;
   width:100%;
   line-height: 38px;
   text-align: center;
   background-color: rgba(0, 255, 255, 0.718);
-
 }
 </style>

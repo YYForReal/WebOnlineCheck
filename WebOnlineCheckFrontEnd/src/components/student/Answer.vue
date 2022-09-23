@@ -4,7 +4,7 @@
 
     <el-form-item prop="questionId">
       <el-select v-model="form.questionId" placeholder="请选择实验题目">
-        <el-option v-for="item in questionList" :key="item.questionId" :label="item.questionTitle"
+        <el-option v-for="item in questionList" :key="item.questionId" :label="item.title"
           :value="item.questionId" />
       </el-select>
     </el-form-item>
@@ -17,11 +17,13 @@
     <el-form-item>
       <el-button type="primary" @click="handleSumbit" :loading="logining">提交</el-button>
     </el-form-item>
+
+    <MySubmitVue/>
   </el-form>
 </template>
 
 <script>
-
+import MySubmitVue from './MySubmit.vue'
 export default {
   name: 'Answer',
   data () {
@@ -41,19 +43,26 @@ export default {
         userId: null,
         content: null
       },
-      questionList: [
-        {
-          questionId: 1,
-          questionTitle: 'AAAA'
-        },
-        {
-          questionId: 2,
-          questionTitle: 'AffA'
-        }
-      ]
+      questionList: []
     }
   },
+  components: {
+    MySubmitVue
+  },
+  mounted () {
+    this.refreshQuestionList()
+  },
   methods: {
+    refreshQuestionList () {
+      this.axios({
+        url: this.baseUrl + '/question/get',
+        method: 'get'
+      }).then((res) => {
+        this.questionList = res.data
+      }).catch((err) => {
+        console.log('search question: ', err)
+      })
+    },
     handleSumbit () {
       this.$refs.AnswerFrom.validate((valid) => {
         if (valid) {
@@ -89,7 +98,6 @@ export default {
           var oMyForm = new FormData()
           oMyForm.append('userId', this.account.userid)
           oMyForm.append('username', this.account.username)
-          console.info(oMyForm)
           return oMyForm
         }]
       })
@@ -103,7 +111,6 @@ export default {
           oMyForm.append('userId', this.account.userid)
           oMyForm.append('questionId', this.form.questionId)
           oMyForm.append('content', this.form.content)
-          console.info(oMyForm)
           return oMyForm
         }]
       }).then((res) => {

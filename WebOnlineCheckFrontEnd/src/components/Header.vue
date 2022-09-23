@@ -1,6 +1,6 @@
 <template>
     <el-container>
-        <el-header class="header" height="100px">
+        <el-header class="header" height="80px">
             <div class="left">
                 <h3>Web 编程实验 校验网站</h3>
             </div>
@@ -43,17 +43,17 @@ export default {
 .header {
   background-color: darkturquoise;
   color: aliceblue;
-  height: 100px;
+  height: 80px;
 }
 .left{
     float: left;
-    height: 100px;
-    line-height: 100px;
+    height: 80px;
+    line-height: 80px;
 }
 .right{
-  height: 100px;
+  height: 80px;
     float:right;
-    line-height: 100px;
+    line-height: 80px;
 }
 
 .button{
