@@ -16,12 +16,10 @@
         placeholder="在此输入html文本"></el-input>
     </el-form-item>
 
-    <!-- <MySubmitVue /> -->
   </el-form>
 </template>
 
 <script>
-import MySubmitVue from './MySubmit.vue'
 export default {
   name: 'Answer',
   data () {
@@ -45,7 +43,7 @@ export default {
     }
   },
   components: {
-    MySubmitVue
+
   },
   mounted () {
     this.refreshQuestionList()

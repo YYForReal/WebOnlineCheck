@@ -2,26 +2,12 @@
   <div calss="container">
     <el-row class="tac">
       <el-col class="side-bar" :span="3">
-        <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
-          <el-submenu index="1" disabled>
-            <template slot="title">
-              <i class="el-icon-location"></i>
-              <span>提交记录（TODO）</span>
-            </template>
-            <el-menu-item-group>
-              <template slot="title">分组一</template>
-              <el-menu-item index="1-1">选项1</el-menu-item>
-              <el-menu-item index="1-2">选项2</el-menu-item>
-            </el-menu-item-group>
-            <el-menu-item-group title="分组2">
-              <el-menu-item index="1-3">选项3</el-menu-item>
-            </el-menu-item-group>
-            <el-submenu index="1-4">
-              <template slot="title">选项4</template>
-              <el-menu-item index="1-4-1">选项1</el-menu-item>
-            </el-submenu>
-          </el-submenu>
-          <el-menu-item index="2">
+        <el-menu default-active="1" class="el-menu-vertical" :router="true">
+          <el-menu-item index="list" >
+            <i class="el-icon-document"></i>
+            <span slot="title">已提交列表</span>
+          </el-menu-item>
+          <el-menu-item index="answer">
             <i class="el-icon-menu"></i>
             <span slot="title">提交答案</span>
           </el-menu-item>
@@ -52,12 +38,6 @@
 export default {
   name: 'Main',
   methods: {
-    handleOpen (key, keyPath) {
-      console.log(key, keyPath)
-    },
-    handleClose (key, keyPath) {
-      console.log(key, keyPath)
-    }
   },
   components: {
   }
@@ -65,18 +45,21 @@ export default {
 </script>
 
 <style scoped>
-.container{
-  width:100%;
+.container {
+  width: 100%;
 }
 
-.container >>> .side-bar{
+.container>>>.side-bar {
   height: 100%;
 }
 
-.fix-reading-box{
+.side-bar>>>.el-menu-item {
+  min-width: 0;
+}
+
+.fix-reading-box {
   position: fixed;
   right: 0;
   bottom: 0;
 }
-
 </style>
