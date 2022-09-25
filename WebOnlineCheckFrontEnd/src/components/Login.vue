@@ -142,7 +142,7 @@ h3 {
 }
 
 .login-container {
-  width: 350px;
+  width:350px;
   margin: 0 auto;
 }
 

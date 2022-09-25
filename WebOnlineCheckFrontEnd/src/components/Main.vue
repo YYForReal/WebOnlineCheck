@@ -37,9 +37,13 @@
       </el-col>
       <el-col :span="21">
         <router-view></router-view>
+        <div class="fix-reading-box">
+          <video src="http://www.yywebsite.cn/video/reading.mp4" autoplay loop muted width="200px"></video>
+        </div>
       </el-col>
 
     </el-row>
+
   </div>
 </template>
 
@@ -67,6 +71,12 @@ export default {
 
 .container >>> .side-bar{
   height: 100%;
+}
+
+.fix-reading-box{
+  position: fixed;
+  right: 0;
+  bottom: 0;
 }
 
 </style>

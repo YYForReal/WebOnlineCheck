@@ -153,15 +153,16 @@ h3 {
 }
 
 .login-container {
-  min-width: 350px;
+  width: 70%;
+  min-width:300px;
   text-align: center;
   margin: 0 auto;
 }
 
 .html-text-box {
-  width: 70%;
-  min-width: 500px;
-  min-height: 400px;
+  width: 100%;
+  min-width: 300px;
+  min-height: 300px;
 }
 
 .html-text-box>>>.el-textarea__inner {
