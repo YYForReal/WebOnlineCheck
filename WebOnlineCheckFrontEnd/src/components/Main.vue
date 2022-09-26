@@ -2,7 +2,7 @@
   <div calss="container">
     <el-row class="tac">
       <el-col class="side-bar" :span="3">
-        <el-menu default-active="1" class="el-menu-vertical" :router="true">
+        <el-menu default-active="list" class="el-menu-vertical" :router="true">
           <el-menu-item index="list" >
             <i class="el-icon-document"></i>
             <span slot="title">已提交列表</span>
@@ -53,9 +53,9 @@ export default {
   height: 100%;
 }
 
-.side-bar>>>.el-menu-item {
+/* .side-bar>>>.el-menu-item {
   min-width: 0;
-}
+} */
 
 .fix-reading-box {
   position: fixed;

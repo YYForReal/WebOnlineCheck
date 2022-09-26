@@ -7,8 +7,8 @@ import Login from '@/components/Login.vue'
 const Answer = resolve => require(['@/components/student/Answer'], resolve)
 const Home = () => import('@/components/teacher/Home')
 const QuestionList = () => import('@/components/student/QuestionList')
-// const Judge = () => import('@/components/teacher/Judge')
-// const ScoreList = () => import('@/components/teacher/ScoreList')
+const JudgeTable = () => import('@/components/teacher/JudgeTable')
+const ScoreList = () => import('@/components/teacher/ScoreList')
 
 Vue.use(Router)// 注册vue-router
 
@@ -19,7 +19,7 @@ export default new Router({
       path: '/',
       name: 'Main',
       component: Main,
-      redirect: '/answer',
+      redirect: '/list',
       children: [
         {
           path: '/answer',
@@ -39,21 +39,22 @@ export default new Router({
       component: Login
     },
     {
-      path: '/teacher/home',
+      path: '/teacher',
       name: 'Home',
-      component: Home
-      // children: [
-      //   {
-      //     path: 'scorelist',
-      //     name: 'ScoreList',
-      //     component: ScoreList
-      //   },
-      //   {
-      //     path: 'judge',
-      //     name: 'Judge',
-      //     component: Judge
-      //   }
-      // ]
+      component: Home,
+      redirect: '/teacher/home',
+      children: [
+        {
+          path: 'list',
+          name: 'ScoreList',
+          component: ScoreList
+        },
+        {
+          path: 'home',
+          name: 'JudgeTable',
+          component: JudgeTable
+        }
+      ]
     }
 
   ]

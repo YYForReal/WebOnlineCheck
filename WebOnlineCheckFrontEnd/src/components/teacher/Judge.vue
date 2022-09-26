@@ -1,5 +1,5 @@
 <template>
-  <div class="judge-card">
+  <el-card class="judge-card">
     <div class="student-info-box">
       <el-form :inline="true" :model="formInline">
         <el-form-item label="学号">
@@ -42,7 +42,7 @@
       </tr>
     </table>
 
-  </div>
+  </el-card>
 </template>
 
 <script>
@@ -281,14 +281,14 @@ export default {
 .judge-card {
   /* justify-content: center; */
   /* align-items: center; */
-  width: 100%;
+  width: 95%;
   border-radius: 5px;
-  background-color: rgba(240, 250, 255, 0.593);
+  /* background-color: rgba(240, 250, 255, 0.593); */
   min-height: 300px;
-  margin: 20px auto;
-  margin-bottom: 40px;
+  margin: 5px auto;
+  margin-bottom: 30px;
   padding-bottom: 5px;
-  border: 1px dotted dodgerblue;
+  /* border: 1px dotted dodgerblue; */
 }
 
 .judge-card .table {
@@ -328,6 +328,8 @@ export default {
 
 .judge-card >>> iframe {
   width: 100%;
+  height:100%;
+  margin:0;
   min-height: 100px;
   max-height: 400px;
   overflow: scroll;

@@ -1,6 +1,6 @@
 <template>
   <el-form ref="AccountFrom" :model="account" :rules="rules" label-width="0px" class="login-container">
-    <h3>系统登录</h3>
+    <h2>系统登录</h2>
     <el-form-item prop="username">
       <el-input type="text" v-model="account.username" auto-complete="off" placeholder="姓名"></el-input>
     </el-form-item>
@@ -10,9 +10,9 @@
     </el-form-item>
     <el-form-item class="btn-box">
       <el-button type="primary" @click="handleLogin" :loading="logining">登录</el-button>
-      <el-button type="primary">
+      <!-- <el-button type="primary">
         <router-link to="/" style="text-decoration:none; color:white">返回首页</router-link>
-      </el-button>
+      </el-button> -->
     </el-form-item>
   </el-form>
 </template>
@@ -26,8 +26,8 @@ export default {
     return {
       logining: false,
       account: {
-        username: '黄友艺',
-        userid: '2019152042'
+        username: 'web123',
+        userid: 'web123'
       },
       /* 判断：如果用户没有输入用户名，提示“请输入账号”
         判断：如果用户没有输入密码，提示“请输入密码”用于表单验证 */
@@ -124,7 +124,7 @@ export default {
           message: '欢迎你，' + this.account.username + '!',
           duration: 3000
         })
-        this.$router.push('/teacher/home')
+        this.$router.push('/teacher/')
       })
     }
   }
@@ -136,9 +136,10 @@ body {
   background: aquamarine;
 }
 
-h3 {
+h2,h3 {
   text-align: center;
   margin-bottom: 30px;
+  margin-top:18px;
 }
 
 .login-container {

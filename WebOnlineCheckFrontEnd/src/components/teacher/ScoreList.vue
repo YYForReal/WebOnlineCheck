@@ -12,16 +12,6 @@
                 <td v-for="(score,i) in student.scoreArr" :key="i">{{score}}</td>
             </tr>
         </table>
-        <!-- <el-table :data="questionList" border="true" style="width: 100%">
-            <el-table-column prop="userId" label="学号" width="180">
-            </el-table-column>
-            <el-table-column prop="username" label="姓名" width="180">
-            </el-table-column>
-            <el-table-column label="实验">
-                <el-table-column v-for="item in questionList" :key="item.questionId" prop="score" label="地址">
-                </el-table-column>
-            </el-table-column>
-        </el-table> -->
     </div>
 </template>
 <script>
@@ -115,8 +105,16 @@ export default {
 }
 </script>
 <style scoped >
+.user-score-list{
+  width:95%;
+  margin:0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 table{
+  display: block;
     min-width:100%;
 }
 
