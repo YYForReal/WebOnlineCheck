@@ -4,11 +4,15 @@
       <el-menu default-active="home" class="el-menu-vertical" :router="true">
         <el-menu-item index="home">
           <i class="el-icon-menu"></i>
-          <span slot="title">实验列表</span>
+          <span slot="title">提交列表</span>
         </el-menu-item>
         <el-menu-item index="list">
           <i class="el-icon-document"></i>
           <span slot="title">分数总览</span>
+        </el-menu-item>
+        <el-menu-item index="setting">
+          <i class="el-icon-setting"></i>
+          <span slot="title">实验设置</span>
         </el-menu-item>
       </el-menu>
     </el-col>

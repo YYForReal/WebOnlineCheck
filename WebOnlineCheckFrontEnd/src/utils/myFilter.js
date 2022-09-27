@@ -5,7 +5,6 @@ export const MyFilter = {
     time = time.replace(/-/, '月')
     time = time.replace(/T/, '日')
     let times = time.split('.')
-    console.log(times[0])
     return times[0]
   }
 }

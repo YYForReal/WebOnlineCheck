@@ -56,14 +56,14 @@ export default {
     this.refreshQuestionList()
   },
   methods: {
-    refreshAnswerList (questionId) {
+    refreshAnswerList () {
       this.axios({
-        url: this.baseUrl + '/answer/get?questionId=' + questionId,
+        url: this.baseUrl + '/answer/get?questionId=' + this.form.questionId,
         method: 'get'
       }).then((res) => {
         this.answerList = res.data
       }).catch((err) => {
-        console.log('search answer: ', err)
+        console.log('request /answer/get: ', err)
       })
     },
     refreshQuestionList () {
@@ -73,7 +73,7 @@ export default {
       }).then((res) => {
         this.questionList = res.data
       }).catch((err) => {
-        console.log('search question: ', err)
+        console.log('request /question/get: ', err)
       })
     },
     changeScore (answerId, score) {
@@ -112,9 +112,7 @@ export default {
 
     // },
     answerList: {
-      handler (newList) {
-        console.log('new list:', newList)
-      },
+      handler () {},
       deep: true
     }
   },

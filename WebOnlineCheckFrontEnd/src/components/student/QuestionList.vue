@@ -1,7 +1,6 @@
 <template>
   <el-row class="question-list">
     <h2>已提交列表</h2>
-    <p class="infomation">说明：提交后分数默认为0，不要慌张，这时候只是还没有批改。<small><del>（当然，不排除交了个0分答案）</del></small></p>
     <el-collapse class="submit-list" v-model="activeNames"  accordion>
       <el-collapse-item v-for="answer in scoreList" :key="answer.answerId" :title="answer.questionTitle"
         :name="answer.answerId">
@@ -23,7 +22,12 @@
         </div>
       </el-collapse-item>
     </el-collapse>
-
+    <h4>说明</h4>
+    <ol>
+      <li class="information">所得分数以老师登分册为准。 </li>
+      <li class="information">提交列表中仅出现已提交的记录，若没提交，则无记录。 </li>
+      <li class="information">之前实验已经提交的内容不需要再次提交。 </li>
+    </ol>
   </el-row>
 </template>
 <script>
@@ -52,26 +56,29 @@ export default {
       return MyFilter.dateFormat(str)
     },
     refreshSubmitList () {
-      this.axios.get(this.baseUrl + '/user/get/score?userId=' + this.account.userid + '&username=' + this.account.username)
-        .then(res => {
-          if (res.status === 200 && res.data.status === 200) {
-            console.log('look:', res)
-            this.scoreList = res.data.data.answerList
-          } else {
+      if (this.account != null) {
+        this.axios.get(this.baseUrl + '/user/get/score?userId=' + this.account.userid + '&username=' + this.account.username)
+          .then(res => {
+            if (res.status === 200 && res.data.status === 200) {
+              this.scoreList = res.data.data.answerList
+            } else {
+              this.$message({
+                type: 'error',
+                message: res.data.message,
+                showClose: true
+              })
+            }
+          }).catch(err => {
             this.$message({
               type: 'error',
-              message: res.data.message,
+              message: '获取提交列表失败',
               showClose: true
             })
-          }
-        }).catch(err => {
-          this.$message({
-            type: 'error',
-            message: '获取提交列表失败',
-            showClose: true
+            console.log(err)
           })
-          console.log(err)
-        })
+      } else {
+        this.$router.push('/login')
+      }
     }
   }
 }
@@ -80,9 +87,9 @@ export default {
 .question-list {
   width: 100%;
 }
-.infomation{
+.information{
   text-align: left;
-  text-indent: 2em;
+  font-size:small;
 }
 .question-list h1,
 h2,

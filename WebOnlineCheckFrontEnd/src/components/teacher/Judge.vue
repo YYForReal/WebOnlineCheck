@@ -95,7 +95,6 @@ export default {
       return str
     },
     changed () {
-      console.log('***********************************************')
       this.compText = this.delHtmlTag(this.questionText)
       this.answerText = this.delHtmlTag(this.filterScript(this.filterBody(this.content)))
       // eslint-disable-next-line no-undef
@@ -255,14 +254,11 @@ export default {
     }
   },
   watch: {
-    answerId: function (val) {
-      console.log('get answerId', val)
+    answerId: function () {
     },
-    content: function (val) {
-      console.log('get content', val)
+    content: function () {
     },
     score: function (val) {
-      console.log('get score', val)
       this.newScore = val
     }
   },

@@ -56,7 +56,6 @@ export default {
       }).then(res => {
         if (res.status === 200) {
           this.studentList = res.data.data
-          console.log(res)
           const questionLength = this.questionList.length
           for (let i = 0; i < this.studentList.length; i++) {
             let student = this.studentList[i]
@@ -90,15 +89,9 @@ export default {
   },
   watch: {
     studentList: {
-      handler (newValue) {
-        // console.log(newValue)
-      },
       deep: true
     },
     questionList: {
-      handler (newValue) {
-        // console.log(newValue)
-      },
       deep: true
     }
   }

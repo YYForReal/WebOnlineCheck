@@ -9,6 +9,7 @@ const Home = () => import('@/components/teacher/Home')
 const QuestionList = () => import('@/components/student/QuestionList')
 const JudgeTable = () => import('@/components/teacher/JudgeTable')
 const ScoreList = () => import('@/components/teacher/ScoreList')
+const QuestionSetting = () => import('@/components/teacher/QuestionSetting')
 
 Vue.use(Router)// 注册vue-router
 
@@ -53,6 +54,10 @@ export default new Router({
           path: 'home',
           name: 'JudgeTable',
           component: JudgeTable
+        }, {
+          path: 'setting',
+          name: 'QuestionSetting',
+          component: QuestionSetting
         }
       ]
     }
