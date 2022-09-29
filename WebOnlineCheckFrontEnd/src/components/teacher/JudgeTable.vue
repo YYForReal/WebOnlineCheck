@@ -97,20 +97,7 @@ export default {
         this.refreshAnswerList(newId)
       }
     },
-    // 'form.userId': {
-    //   handler (newId) {
 
-    //   }
-    // },
-    // 'form.username': {
-    //   handler (newvalue) {
-    //     this.answerList = this.answerList.filter((value) => {
-    //       console.log('value:', value)
-    //       return value.username.indexOf(newvalue) !== -1
-    //     })
-    //   }
-
-    // },
     answerList: {
       handler () {},
       deep: true

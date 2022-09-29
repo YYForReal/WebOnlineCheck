@@ -4,8 +4,11 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'// 引入路由配置
 import Vuex from 'vuex'// 导入仓库配置
+
 // import ElementUI from 'element-ui'
+// import ELEMENT from 'element-ui'
 // import 'element-ui/lib/theme-chalk/index.css'
+
 import store from './store/store'
 import axios from 'axios'
 
@@ -15,6 +18,8 @@ Vue.prototype.axios = axios
 Vue.prototype.baseUrl = 'http://118.31.165.150:5520'
 Vue.config.productionTip = false
 // Vue.use(ElementUI)
+// Vue.use(ELEMENT) // 注意大写
+
 Vue.use(Vuex)
 Vue.config.productionTip = false
 /* eslint-disable no-new */

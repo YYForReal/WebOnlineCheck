@@ -11,25 +11,12 @@
             <i class="el-icon-menu"></i>
             <span slot="title">提交答案</span>
           </el-menu-item>
-          <!-- <el-menu-item index="3" disabled>
-            <i class="el-icon-document"></i>
-            <span slot="title">提交记录（TODO）</span>
-          </el-menu-item> -->
-          <!-- <el-menu-item index="4">
-            <i class="el-icon-setting"></i>
-            <span slot="title">导航四</span>
-          </el-menu-item> -->
         </el-menu>
       </el-col>
       <el-col :span="21">
         <router-view></router-view>
-        <div class="fix-reading-box">
-          <video src="http://www.yywebsite.cn/video/reading.mp4" autoplay loop muted width="200px"></video>
-        </div>
       </el-col>
-
     </el-row>
-
   </div>
 </template>
 
@@ -57,9 +44,4 @@ export default {
   min-width: 0;
 } */
 
-.fix-reading-box {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-}
 </style>

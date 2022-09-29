@@ -14,6 +14,9 @@
         <router-link to="/" style="text-decoration:none; color:white">返回首页</router-link>
       </el-button> -->
     </el-form-item>
+    <div class="fix-reading-box">
+          <video src="http://www.yywebsite.cn/video/reading.mp4" autoplay loop muted width="200px"></video>
+        </div>
   </el-form>
 </template>
 
@@ -151,6 +154,11 @@ h2,h3 {
   display: flex;
   justify-content: center;
   align-items:center;
+}
 
+.fix-reading-box {
+  position: fixed;
+  right: 0;
+  bottom: 0;
 }
 </style>

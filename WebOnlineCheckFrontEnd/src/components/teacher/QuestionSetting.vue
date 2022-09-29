@@ -39,6 +39,9 @@
     <el-form-item label="对比文本" :label-width="formLabelWidth" >
       <el-input v-model="form.content"  type="textarea"  :disabled="form.isDelete" ></el-input>
     </el-form-item>
+    <!-- <el-form-item label="CSS属性" v-for="(attribute,index) in form.attributes" :key="index" :label-width="formLabelWidth" >
+      <el-input v-model="form.content"  type="textarea"  :disabled="form.isDelete" ></el-input>
+    </el-form-item> -->
   </el-form>
   <div slot="footer" class="dialog-footer">
     <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -62,7 +65,6 @@
       <el-input class="html-text-box" type="textarea" v-model="form.content" auto-complete="off" resize="none"
         placeholder="在此输入html文本"></el-input>
     </el-form-item>
-
   </el-form> -->
 </template>
 <script>
@@ -90,6 +92,7 @@ export default {
         userId: null,
         username: null,
         isDelete: false
+        // attributes: []
       },
       formLabelWidth: '120px'
     }
