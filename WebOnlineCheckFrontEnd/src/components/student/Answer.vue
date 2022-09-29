@@ -65,7 +65,6 @@ export default {
           this.checkUser().then((res) => {
             if (res.data === 'OK') {
               this.form.userId = this.account.userid
-              console.log('success', this.form)
               this.post()
             } else {
               this.$message({

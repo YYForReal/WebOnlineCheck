@@ -14,6 +14,9 @@
         <router-link to="/" style="text-decoration:none; color:white">返回首页</router-link>
       </el-button> -->
     </el-form-item>
+    <div class="fix-reading-box">
+          <video src="http://www.yywebsite.cn/video/reading.mp4" autoplay loop muted width="200px"></video>
+        </div>
   </el-form>
 </template>
 
@@ -26,8 +29,8 @@ export default {
     return {
       logining: false,
       account: {
-        username: 'web123',
-        userid: 'web123'
+        username: '',
+        userid: ''
       },
       /* 判断：如果用户没有输入用户名，提示“请输入账号”
         判断：如果用户没有输入密码，提示“请输入密码”用于表单验证 */
@@ -48,7 +51,6 @@ export default {
         if (valid) {
           this.checkUser()
             .then((response) => {
-              console.log('res:', response)
               if (response.data === 'OK') {
                 this.checkUserType().then((res) => {
                   if (res.data == null) {
@@ -114,7 +116,7 @@ export default {
           message: '欢迎你，' + this.account.username + '!',
           duration: 3000
         })
-        this.$router.push('/answer')
+        this.$router.push('/list')
       })
     },
     teacherLogin () {
@@ -152,6 +154,11 @@ h2,h3 {
   display: flex;
   justify-content: center;
   align-items:center;
+}
 
+.fix-reading-box {
+  position: fixed;
+  right: 0;
+  bottom: 0;
 }
 </style>

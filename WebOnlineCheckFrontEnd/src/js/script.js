@@ -52,7 +52,6 @@ inputs[0].onchange = function () {
     sourceTxt = sourceTxt.filter((char) => {
       return char !== '\r' && char !== '\n'
     })
-    console.log(sourceTxt)
     resultText.innerText = '读取txt文本成功\r\n'
     a.textContent = sourceTxt.join('')
     if (resultTxt !== null) {
@@ -69,7 +68,6 @@ inputs[1].onchange = function () {
   // 开始读取
   var file = this.files[0]
   var reader = new FileReader()
-  console.log(this.files)
   reader.readAsText(file)
   resultText.innerText = ''
   // 文件读取完成后，获取读取的结果
@@ -80,8 +78,6 @@ inputs[1].onchange = function () {
 
     var iwindow = iframe.contentWindow // 获取iframe的window对象
     var idoc = iwindow.document // 获取iframe的document对象
-    // console.log(idoc.documentElement); //获取iframe的html
-    // console.log("body",idoc.body);
     idoc.open()
     idoc.write(resultTxt)
     idoc.close()
@@ -125,7 +121,7 @@ function checkFirst () {
       isError = true
     } else {
       searchIndex = searchResult
-      console.log(`检查第${nowIndex}个字符成功： ${checkText} html文件位置为：${searchIndex}\r\n`)
+      // console.log(`检查第${nowIndex}个字符成功： ${checkText} html文件位置为：${searchIndex}\r\n`)
     }
     nowIndex++
   }
@@ -180,7 +176,6 @@ function delHtmlTag (str) {
 // 引入并使用其他的辅助代码
 
 function changed () {
-  console.log('***********************************************')
   var oldContent = a.textContent
   var content1 = b.textContent
   // eslint-disable-next-line no-undef
