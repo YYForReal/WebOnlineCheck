@@ -1,5 +1,20 @@
 # Web 在线校验网站
 
+## 效果
+
+### 学生端
+
+![image](https://user-images.githubusercontent.com/66943144/193014916-08c5c01f-f3a1-4bc4-98f7-8d0da0871f76.png)
+
+
+![image](https://user-images.githubusercontent.com/66943144/193014829-381c9077-cee9-412f-bcc7-284c59e0a985.png)
+
+### 老师端
+
+![image](https://user-images.githubusercontent.com/66943144/193015192-706c218f-3a59-4770-97e5-df66c3007403.png)
+
+
+
 ## 网站功能
 
 ### 已实现
@@ -57,3 +72,7 @@
    2. 接口安全性的提高，需增加防御机制（断言，过滤），防SQL注入
    3. 整体UI界面的优化
    4. 数据库字段间的限制关系存在优化空间
+
+
+
+
