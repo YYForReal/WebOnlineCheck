@@ -14,7 +14,7 @@ const QuestionSetting = () => import('@/components/teacher/QuestionSetting')
 Vue.use(Router)// 注册vue-router
 
 export default new Router({
-  base: '/webcheck/',
+  base: '/webcheck-backup/',
   routes: [
     {
       path: '/',

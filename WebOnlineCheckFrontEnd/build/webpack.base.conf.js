@@ -78,9 +78,9 @@ module.exports = {
     ]
   },
   externals: {
-    'vue': 'Vue',
+    // 'vue': 'Vue',
     // 'vue-router': 'VueRouter',
-    'ElementUI': 'ELEMENT'
+    // 'ElementUI': 'ELEMENT'
     // 'axios': 'axios',
   },
   node: {

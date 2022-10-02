@@ -48,7 +48,7 @@ export default {
   mounted () {
     setTimeout(() => {
       this.changed()
-    }, 500)
+    }, 800)
   },
   methods: {
     delHtmlTag (str) {
