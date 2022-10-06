@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hyy.webcheck.service.QuestionDao">
+    <!--根据文章id拿到回答-->
+    <select id="getQuestions" resultType="com.hyy.webcheck.bean.Question">
+        SELECT
+            question.question_id AS 'questionId',
+            question.user_id AS 'userId',
+            question.title,
+            question.content,
+            question.html,
+            question.release_time AS 'releaseTime',
+            question.update_time AS 'updateTime',
+            users.username AS 'username'
+
+        FROM
+            question,
+            users
+        WHERE
+            question.user_id = users.user_id
+    </select>
+
+    <!--根据文章id拿到回答-->
+    <select id="getQuestionInfo" resultType="com.hyy.webcheck.bean.QuestionWithScore">
+        SELECT
+            question.question_id AS 'questionId',
+            question.title
+        FROM
+            question
+    </select>
+
+
+    <select id="searchQuestion" resultType="String">
+        SELECT html
+        FROM question
+        where question_id = #{questionId}
+    </select>
+
+
+
+    <!--增加回答-->
+    <insert id="postQuestion">
+        insert into question(title,  content ,user_id, release_time, update_time)
+        values (#{title}, #{content}, #{userId}, #{releaseTime}, #{releaseTime});
+    </insert>
+
+    <select id="getQuestionsWithAllStudentsScore" resultType="com.hyy.webcheck.bean.Question">
+        SELECT
+            question.question_id AS 'questionId',
+                question.user_id AS 'userId',
+                question.title,
+            question.content,
+            question.release_time AS 'releaseTime',
+                question.update_time AS 'updateTime',
+                users.username AS 'username'
+        FROM
+            question,
+            users
+        WHERE
+            question.user_id = users.user_id
+    </select>
+
+    <select id="getUserScoreList" resultType="com.hyy.webcheck.bean.UserOneScore">
+        SELECT
+            users.user_id AS 'userId',
+            users.username AS 'userName',
+            answers.score
+        FROM
+            users
+        LEFT JOIN answers on users.user_id = answers.user_id
+        WHERE
+            answers.question_id = #{questionId}
+
+    </select>
+
+    <update id="updateQuestion">
+        update question
+        SET title=#{title}, content= #{content},update_time = #{updateTime},user_id = #{userId}
+        WHERE question_id = #{questionId}
+    </update>
+
+    <delete id="deleteQuestion" parameterType="Integer">
+        delete from question
+        where question_id = #{questionId}
+    </delete>
+
+
+</mapper>
