@@ -1,22 +1,38 @@
 <template>
   <el-row class="question-list">
     <h2>已提交列表</h2>
-    <el-collapse class="submit-list" v-model="activeNames"  accordion>
+    <el-collapse class="submit-list" v-model="activeNames" accordion>
       <el-collapse-item v-for="answer in scoreList" :key="answer.answerId" :title="answer.questionTitle"
         :name="answer.answerId">
-        <div>
-          <span class="collapse-label">更新时间</span>
-          {{formatTime(answer.updateTime)}}
-        </div>
-        <div>
-          <span class="collapse-label">是否可查看比对结果：{{answer.compareText?'Yes':'No'}}</span>
-        </div>
+
+        <el-form :inline="true">
+          <el-form-item label="最近更新时间" >
+            <span>{{formatTime(answer.updateTime)}}</span>
+            <!-- <el-input class="form-span" v-bind="" disabled="disabled"></el-input> -->
+          </el-form-item>
+          <el-form-item label="是否可查看比对结果" label-width="150px">
+            {{answer.compareText?'Yes':'No'}}
+            <!-- <span>{{formatTime(answer.updateTime)}}</span> -->
+            <!-- <el-input class="form-span" v-bind="" disabled="disabled"></el-input> -->
+          </el-form-item>
+          <!-- <el-form-item label="相似度:">
+            <el-input class="form-span" v-loading="!similarity" v-model="similarity" disabled="disabled"></el-input>
+          </el-form-item> -->
+        </el-form>
+
+        <!-- <div>
+          <span class="collapse-label">是否可查看比对结果：</span>
+        </div> -->
         <div v-if="answer.compareText == null">
-          <h4>提交内容</h4>
-          <p>{{answer.content}}</p>
+          <el-form>
+            <el-form-item label="提交内容">
+              <el-input type="textarea" v-text="answer.content"  disabled></el-input>
+            </el-form-item>
+          </el-form>
+          <!-- <h4>提交内容</h4> -->
         </div>
         <div v-else>
-          <CompareCardVue :visitType="0" :content="answer.content" :questionText="answer.compareText" ></CompareCardVue>
+          <CompareCardVue :visitType="0" :content="answer.content" :questionText="answer.compareText"></CompareCardVue>
         </div>
       </el-collapse-item>
     </el-collapse>
@@ -29,7 +45,7 @@
   </el-row>
 </template>
 <script>
-import {MyFilter} from '@/utils/myFilter.js'
+import { MyFilter } from '@/utils/myFilter.js'
 import CompareCardVue from '../CompareCard.vue'
 export default {
   name: 'QuestionList',
@@ -89,10 +105,12 @@ export default {
 .question-list {
   width: 100%;
 }
-.information-list li{
+
+.information-list li {
   text-align: left;
-  font-size:small;
+  font-size: small;
 }
+
 .question-list h1,
 h2,
 h3 {
@@ -103,11 +121,13 @@ h3 {
 .submit-list {
   width: 100%;
 }
-.collapse-label{
+
+.collapse-label {
   font-weight: bold;
 }
-.question-list >>> .el-collapse-item__header{
-  font-size:18px;
+
+.question-list>>>.el-collapse-item__header {
+  font-size: 18px;
   text-align: center;
 }
 
@@ -120,5 +140,4 @@ ins {
   background: #00ff22c7;
   text-decoration: none;
 }
-
 </style>

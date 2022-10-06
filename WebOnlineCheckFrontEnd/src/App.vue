@@ -1,16 +1,13 @@
 <template>
   <div id="app">
-    <Header />
     <router-view></router-view>
   </div>
 
 </template>
 
 <script>
-import Header from './components/Header.vue'
 export default {
   name: 'App',
-  components: { Header },
   mounted () {
     const author = `
                           _    _                     _    _ __     ____     __
@@ -25,16 +22,3 @@ export default {
   }
 }
 </script>
-
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-* {
-  padding: 0;
-  margin: 0;
-}
-</style>

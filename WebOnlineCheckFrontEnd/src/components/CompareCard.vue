@@ -1,26 +1,45 @@
 <template>
-    <table class="comp-card">
-      <tr class="table-header">
-        <td>原内容</td>
-        <td>过滤的HTML</td>
-        <td>比对结果</td>
-      </tr>
-      <tr class="table-content">
-        <td v-text="content"></td>
-        <td ref="b" v-text="answerText"></td>
-        <td>
-          <div ref="result" v-html="resultHtml"></div>
-        </td>
-      </tr>
-      <tr class="table-one-header " v-if="visitType == 1">
-        <td colspan="3">HTML效果</td>
-      </tr>
-      <tr v-if="visitType == 1">
-        <td colspan="3">
-          <iframe ref="iframe"></iframe>
-        </td>
-      </tr>
-    </table>
+  <table class="comp-card">
+    <tr class="table-header">
+      <td>原内容</td>
+      <td>过滤的HTML</td>
+      <td>比对结果</td>
+    </tr>
+    <tr class="table-content">
+      <td v-text="content"></td>
+      <td ref="b" v-text="answerText"></td>
+      <td>
+        <div ref="result" v-html="resultHtml"></div>
+      </td>
+    </tr>
+    <tr class="table-one-header " v-if="visitType == 1">
+      <td>参考运行截图 </td>
+      <td colspan="2">运行截图</td>
+    </tr>
+    <tr v-if="visitType == 1">
+      <td v-loading="!comparePic">
+        <!-- <img :src="comparePic" class="comp-image"> -->
+        <!--
+        <a :href="comparePic" target="_blank" title="查看最大化图片">
+            <img :src="comparePic" class="comp-image">
+          </a>
+          <img slot="reference" :src="comparePic" style="width: 50px;height: 50px; cursor:pointer"> -->
+        <el-popover placement="top-start" trigger="click">
+          <img :src="comparePic" class="comp-image">
+          <img slot="reference" :src="comparePic" class="comp-image">
+        </el-popover>
+      </td>
+      <td colspan="2" v-loading="!runningPic">
+        <!-- 不使用iframe进行观察，替换为运行截图 -->
+        <!-- <iframe ref="iframe"></iframe> -->
+        <el-popover placement="top-start" trigger="click">
+          <!--trigger属性值：hover、click、focus 和 manual-->
+          <img :src="runningPic" class="comp-image">
+          <img slot="reference" :src="runningPic" class="comp-image">
+        </el-popover>
+      </td>
+    </tr>
+  </table>
 </template>
 <script>
 export default {
@@ -48,7 +67,7 @@ export default {
   mounted () {
     setTimeout(() => {
       this.changed()
-    }, 500)
+    }, 800)
   },
   methods: {
     delHtmlTag (str) {
@@ -94,11 +113,13 @@ export default {
       var html = arr.join('')
       this.resultHtml = html
       // 在iframe里面显示效果
-      this.showHtml()
+      // this.showHtml()
     },
     showHtml () {
       // this.$refs.iframe.src = this.content
-      var iwindow = this.$refs.iframe.contentWindow // 获取iframe的window对象
+      const iframe = this.$refs.iframe
+      if (iframe == null) return
+      var iwindow = iframe.contentWindow // 获取iframe的window对象
       var idoc = iwindow.document // 获取iframe的document对象
       idoc.open()
       idoc.write(this.filterScript(this.content))
@@ -130,6 +151,14 @@ export default {
     questionText: {
       type: String,
       default: ''
+    },
+    comparePic: {
+      type: String,
+      default: null
+    },
+    runningPic: {
+      type: String,
+      default: null
     }
   },
   watch: {
@@ -137,7 +166,9 @@ export default {
     },
     score: function (val) {
       this.newScore = val
-    }
+    },
+    comparePic: function () { },
+    runningPic: function () { }
   },
   computed: {
     account () {
@@ -150,52 +181,57 @@ export default {
 }
 </script>
 <style scoped>
-
-.comp-card{
-    margin: 0 auto;
+.comp-card {
+  margin: 0 auto;
 }
 
-.comp-card >>> tr {
+.comp-card>>>tr {
   width: 100%;
 }
 
-.comp-card >>> tr td {
+.comp-card>>>tr td {
   width: 400px;
   border: 1px solid #000000e6;
   overflow-wrap: anywhere;
 }
 
-.comp-card >>> del {
+.comp-card>>>del {
   background: #ff0000bf;
   text-decoration: none;
 }
 
-.comp-card >>> ins {
+.comp-card>>>ins {
   background: #00ff22c7;
   text-decoration: none;
 }
 
-.comp-card >>> iframe {
+.comp-card>>>iframe {
   width: 100%;
-  height:100%;
-  margin:0;
+  height: 100%;
+  margin: 0;
   min-height: 100px;
   max-height: 400px;
   overflow: scroll;
 }
 
-.comp-card >>> .table-header {
+.comp-card>>>.table-header {
   height: 50px;
   line-height: 50px;
   text-align: center;
-  background-color: rgba(0, 255, 255, 0.718);
+  /* background-color: rgba(0, 255, 255, 0.718); */
+  background-color: rgb(24, 226, 230);
 }
 
-.comp-card >>> .table-one-header {
+.comp-card>>>.table-one-header {
   height: 38px;
-  width:100%;
+  width: 100%;
   line-height: 38px;
   text-align: center;
-  background-color: rgba(0, 255, 255, 0.718);
+  background-color: rgb(24, 226, 230);
+}
+
+.comp-card .comp-image {
+  width: 100%;
+  min-height: 100px;
 }
 </style>

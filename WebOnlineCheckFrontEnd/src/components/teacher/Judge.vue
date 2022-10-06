@@ -3,13 +3,26 @@
     <div class="student-info-box">
       <el-form :inline="true" :model="formInline">
         <el-form-item label="学号">
-          <el-input v-model="userId" disabled="disabled"></el-input>
+          <!-- <span class="form-span" >{{userId}}</span> -->
+
+          <el-input class="form-span"  v-model="userId" disabled="disabled"></el-input>
         </el-form-item>
         <el-form-item label="姓名">
-          <el-input v-model="username" disabled="disabled"></el-input>
+          <!-- <span class="form-span" >{{username}}</span> -->
+          <el-input class="form-span" v-model="username" disabled="disabled"></el-input>
         </el-form-item>
-        <el-form-item label="原分数">
+
+        <!-- <el-form-item label="原分数">
           <el-input v-model="score" disabled="disabled"></el-input>
+        </el-form-item>
+         -->
+        <el-form-item label="相似度:" >
+          <!-- <span class="form-span"  v-loading="!similarity">{{similarity}}</span> -->
+          <!-- similarity -->
+          <el-input class="form-span" v-loading="!similarity" v-model="similarity" disabled="disabled"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="picCompare">比对刷新</el-button>
         </el-form-item>
         <el-form-item label="分数">
           <el-input v-model="formInline.newScore" type="number"></el-input>
@@ -19,7 +32,8 @@
         </el-form-item>
       </el-form>
     </div>
-    <CompareCard :visitType="1" :content="content" :questionText="questionText" />
+    <CompareCard :visitType="1" :content="content" :questionText="questionText" :comparePic="basePicUrl2"
+      :runningPic="basePicUrl" />
   </el-card>
 </template>
 
@@ -31,13 +45,73 @@ export default {
     return {
       formInline: {
         newScore: 100
-      }
+      },
+      basePicUrl: null,
+      similarity: null
     }
   },
   components: {
     CompareCard
   },
+  mounted () {
+    this.picCompare()
+  },
   methods: {
+    askForSimilarity (pic1, pic2) {
+      this.axios({
+        url: this.baseUrl + '/answer/compare',
+        method: 'post',
+        transformRequest: [(data) => {
+          var oMyForm = new FormData()
+          oMyForm.append('pic1', pic1)
+          oMyForm.append('pic2', pic2)
+          return oMyForm
+        }]
+      }).then((res) => {
+        // this.$message({
+        //   type: 'success',
+        //   message: res.data.message
+        // })
+        this.similarity = res.data.data
+      }).catch((err) => {
+        console.log('request /answer/compare: ', err)
+      })
+    },
+    picCompare () {
+      // let pageUrl = 'http://yywebsite.cn/'
+      let pageUrl = 'http://yywebsite.cn/webcheck/#/template' + '?answerId=' + this.answerId
+      let width = 1024
+      let height = 768
+      let timeout = 40000
+      let delay = 500
+      this.axios(
+        {
+          method: 'POST',
+          headers: { 'content-type': 'application/x-www-form-urlencoded' },
+          data: `pageUrl=${pageUrl}&width=${width}&height=${height}&timeout=${timeout}&delay=${delay}`,
+          url: 'http://118.31.165.150:3000/api/img'
+        }
+      ).then((res) => {
+        console.log('api/img:', res)
+        if (res.data.code === 0) {
+          // 获取该答案的base转码
+          this.basePicUrl = res.data.data.image
+          console.log('图像的base转码为:', this.basePicUrl)
+          // 获取问题的base转码
+          // this.basePicUrl2 = this.$emit('getQuestionBase')
+          console.log('答案的base转码为:', this.basePicUrl2)
+          this.askForSimilarity(this.basePicUrl, this.basePicUrl2)
+        } else {
+          console.log(res.data.message)
+        }
+      }).catch(() => {
+        this.$message({
+          type: 'error',
+          message: '网络异常',
+          showClose: true
+        })
+      })
+    },
     onSubmit () {
       if (this.account == null) {
         this.$message({
@@ -54,7 +128,6 @@ export default {
         })
         return
       }
-      // TODO 改分
       this.axios({
         url: this.baseUrl + '/user/check',
         method: 'post',
@@ -144,11 +217,19 @@ export default {
     username: {
       type: String,
       default: ''
+    },
+    questionId: {
+      type: Number,
+      default: null
+    },
+    basePicUrl2: {
+      type: String,
+      default: null
     }
   },
   watch: {
-    answerId: function () {},
-    content: function () {},
+    answerId: function () { },
+    content: function () { },
     score: function (val) {
       this.newScore = val
     }
@@ -178,10 +259,16 @@ export default {
   /* border: 1px dotted dodgerblue; */
 }
 
-.judge-card >>> .student-info-box {
+.judge-card>>>.student-info-box {
   width: 100%;
   text-align: center;
   margin-top: 10px;
+}
+
+.form-span{
+  display: inline-block;
+  min-width:100px;
+  max-width:150px;
 }
 
 </style>

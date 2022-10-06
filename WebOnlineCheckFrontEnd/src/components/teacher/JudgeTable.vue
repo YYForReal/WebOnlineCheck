@@ -29,9 +29,8 @@
             <div class="one-box" v-for="item in showAnswerList" :key="item.answerId">
                 <JudgeVue :answerId="item.answerId" :content="item.content" :score="item.score"
                     :questionText="questionText" :userId="item.userId" :username="item.username"
-                    @changeScore="changeScore" />
+                    @changeScore="changeScore" :questionId="form.questionId" :basePicUrl2="ansPicUrl" />
             </div>
-
         </div>
     </div>
 </template>
@@ -49,14 +48,48 @@ export default {
       },
       questionList: [],
       questionText: '',
-      scanType: 0
+      scanType: 0,
+      ansPicUrl: null
     }
   },
   mounted () {
     this.refreshQuestionList()
   },
   methods: {
+    getQuestionBase () {
+      return this.ansPicUrl
+    },
+    askPictureUrl () {
+      let pageUrl = 'http://yywebsite.cn/webcheck/#/template?questionId=' + this.form.questionId
+      let width = 1024
+      let height = 768
+      let timeout = 40000
+      let delay = 500
+      this.axios(
+        {
+          method: 'POST',
+          headers: { 'content-type': 'application/x-www-form-urlencoded' },
+          data: `pageUrl=${pageUrl}&width=${width}&height=${height}&timeout=${timeout}&delay=${delay}`,
+          url: 'http://118.31.165.150:3000/api/img'
+        }
+      ).then((res) => {
+        // console.log('question api/img:', res)
+        if (res.data.code === 0) {
+          // 获取该问题的base转码
+          this.ansPicUrl = res.data.data.image
+        } else {
+          console.log(res.data.message)
+        }
+      }).catch(() => {
+        this.$message({
+          type: 'error',
+          message: '网络异常',
+          showClose: true
+        })
+      })
+    },
     refreshAnswerList () {
+      this.askPictureUrl()
       this.axios({
         url: this.baseUrl + '/answer/get?questionId=' + this.form.questionId,
         method: 'get'

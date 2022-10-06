@@ -51,7 +51,7 @@ export default {
   methods: {
     refreshQuestionList () {
       this.axios({
-        url: this.baseUrl + '/question/get',
+        url: this.baseUrl + '/question/getlist',
         method: 'get'
       }).then((res) => {
         this.questionList = res.data

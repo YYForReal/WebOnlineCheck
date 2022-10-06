@@ -1,18 +1,18 @@
 <template>
-    <div class="user-score-list">
-        <table>
-            <tr>
-                <td style="min-width:80px">学号</td>
-                <td style="min-width:80px">姓名</td>
-                <td v-for="question in questionList" :key="question.questionId">{{question.title}}</td>
-            </tr>
-            <tr v-for="student in studentList" :key="student.userId">
-                <td>{{student.userId}}</td>
-                <td>{{student.userName}}</td>
-                <td v-for="(score,i) in student.scoreArr" :key="i">{{score}}</td>
-            </tr>
-        </table>
-    </div>
+  <div class="user-score-list">
+    <table>
+      <tr>
+        <td style="min-width:80px">学号</td>
+        <td style="min-width:80px">姓名</td>
+        <td v-for="question in questionList" :key="question.questionId">{{question.title}}</td>
+      </tr>
+      <tr v-for="student in studentList" :key="student.userId">
+        <td>{{student.userId}}</td>
+        <td>{{student.userName}}</td>
+        <td v-for="(score,i) in student.scoreArr" :key="i">{{score}}</td>
+      </tr>
+    </table>
+  </div>
 </template>
 <script>
 export default {
@@ -98,28 +98,27 @@ export default {
 }
 </script>
 <style scoped >
-.user-score-list{
-  width:95%;
-  margin:0 auto;
+.user-score-list {
+  width: 95%;
+  margin: 0 auto;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-table{
+table {
   display: block;
-    min-width:100%;
+  min-width: 100%;
 }
 
-tr{
-    width:100%;
+tr {
+  width: 100%;
 }
 
 tr td {
   width: 300px;
   border: 1px solid #000000e6;
-    text-overflow: ellipsis;
-    text-align: center;
+  text-overflow: ellipsis;
+  text-align: center;
 }
-
 </style>
