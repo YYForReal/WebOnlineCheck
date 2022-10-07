@@ -36,9 +36,13 @@
     <el-form-item label="实验标题" :label-width="formLabelWidth">
       <el-input v-model="form.title" :disabled="form.isDelete"></el-input>
     </el-form-item>
-    <el-form-item label="对比文本" :label-width="formLabelWidth" >
+    <el-form-item label="比对文本" :label-width="formLabelWidth" >
       <el-input v-model="form.content"  type="textarea"  :disabled="form.isDelete" ></el-input>
     </el-form-item>
+    <el-form-item label="比对HTML" :label-width="formLabelWidth" >
+      <el-input v-model="form.html"  type="textarea"  :disabled="form.isDelete" ></el-input>
+    </el-form-item>
+
     <!-- <el-form-item label="CSS属性" v-for="(attribute,index) in form.attributes" :key="index" :label-width="formLabelWidth" >
       <el-input v-model="form.content"  type="textarea"  :disabled="form.isDelete" ></el-input>
     </el-form-item> -->
@@ -91,6 +95,7 @@ export default {
         content: null,
         userId: null,
         username: null,
+        html: null,
         isDelete: false
         // attributes: []
       },
@@ -109,6 +114,7 @@ export default {
       this.form.questionId = null
       this.form.content = null
       this.form.title = null
+      this.form.html = null
       this.form.isDelete = false
     },
     handleEdit (index, row) {
@@ -117,6 +123,7 @@ export default {
       this.form.questionId = row.questionId
       this.form.content = row.content
       this.form.title = row.title
+      this.form.html = row.html
       this.form.isDelete = false
     },
     handleDelete (index, row) {
@@ -124,6 +131,7 @@ export default {
       this.form.questionId = row.questionId
       this.form.content = row.content
       this.form.title = row.title
+      this.form.html = row.html
       this.form.isDelete = true
     },
     handleConfirm () {
@@ -181,6 +189,7 @@ export default {
             oMyForm.append('username', this.account.username)
             oMyForm.append('title', this.form.title)
             oMyForm.append('content', this.form.content)
+            oMyForm.append('html', this.form.html)
             return oMyForm
           }]
         }).then((res) => {
@@ -218,6 +227,7 @@ export default {
             oMyForm.append('title', this.form.title)
             oMyForm.append('content', this.form.content)
             oMyForm.append('questionId', this.form.questionId)
+            oMyForm.append('html', this.form.html)
             return oMyForm
           }]
         }).then((res) => {

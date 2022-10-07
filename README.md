@@ -56,8 +56,11 @@
   5. ⭐实现Web运行效果的图像比对
      1. 根据学生回答ID，创建动态路由/template/answerId，该路由显示对应学生的html效果。
      2. 请求接口/api/img，通过模拟访问对应的url获取对应Web页面的运行截图（base64编码形式）。
+        借用Gitee中nop/screenshot-api-server仓库的网页截图功能，通过docker运行在服务器上。
+        链接如下：https://gitee.com/wuxue107/screenshot-api-server
      3. 同理，根据动态路由获取对应问题参考答案的运行截图。
-     4. 请求接口/answer/compare，通过比较两个base64编码形式的图片，通过比对色彩直方图数据差异，得到两个图像的百分比相似度。
+     4. 请求接口/answer/compare，比较两个base64编码形式的图片，通过比对色彩直方图数据差异，得到两个图像的百分比相似度。
+        参考来源：https://www.jb51.net/article/245452.htm
 
 
 ### 未实现

@@ -92,7 +92,7 @@ export default {
           url: 'http://118.31.165.150:3000/api/img'
         }
       ).then((res) => {
-        console.log('api/img:', res)
+        // console.log('api/img:', res)
         if (res.data.code === 0) {
           // 获取该答案的base转码
           this.basePicUrl = res.data.data.image
