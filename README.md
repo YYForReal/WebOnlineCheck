@@ -54,7 +54,9 @@
   3. 展示页面内容时删除script标签及其内部内容，防止脚本注入。
   4. 可以识别部分的转义符号并提前转化为文本符号。
   5. ⭐实现Web运行效果的图像比对
-     1. 根据学生回答ID，创建动态路由/template/answerId，该路由显示对应学生的html效果。
+     1. 根据回答或问题ID，创建动态路由，该路由显示对应学生的html效果。
+        - http://yywebsite.cn/webcheck/#/template?answerId=178 表示显示学生回答ID为178号的html的效果
+        - http://yywebsite.cn/webcheck/#/template?questionId=1 表示显示问题ID为1号的html效果（也是比对的效果）
      2. 请求接口/api/img，通过模拟访问对应的url获取对应Web页面的运行截图（base64编码形式）。
         借用Gitee中nop/screenshot-api-server仓库的网页截图功能，通过docker运行在服务器上。
         链接如下：https://gitee.com/wuxue107/screenshot-api-server
