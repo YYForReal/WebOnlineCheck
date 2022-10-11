@@ -5,7 +5,7 @@
       <el-input type="text" v-model="account.username" auto-complete="off" placeholder="姓名"></el-input>
     </el-form-item>
     <el-form-item prop="userid">
-      <el-input type="text" v-model="account.userid" auto-complete="off" placeholder="学号"
+      <el-input type="password" v-model="account.userid" auto-complete="off" placeholder="学号"
         @keyup.enter.native="handleLogin"></el-input>
     </el-form-item>
     <el-form-item class="btn-box">

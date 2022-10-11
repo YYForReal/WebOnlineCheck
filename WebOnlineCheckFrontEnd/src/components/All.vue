@@ -13,15 +13,16 @@ export default {
   }
 }
 </script>
-<style>
+<style scoped>
 .all {
     width: 100%;
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
-*{
-    padding: 0;
-    margin: 0;
-}
+
+/* *{
+  padding: 0;
+  margin: 0;
+} */
 </style>

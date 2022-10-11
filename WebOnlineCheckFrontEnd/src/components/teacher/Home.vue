@@ -6,7 +6,7 @@
           <i class="el-icon-menu"></i>
           <span slot="title">提交列表</span>
         </el-menu-item>
-        <el-menu-item index="list">
+        <el-menu-item index="list" disabled="true">
           <i class="el-icon-document"></i>
           <span slot="title">分数总览</span>
         </el-menu-item>

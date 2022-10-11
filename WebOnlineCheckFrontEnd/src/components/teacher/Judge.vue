@@ -5,7 +5,7 @@
         <el-form-item label="学号">
           <!-- <span class="form-span" >{{userId}}</span> -->
 
-          <el-input class="form-span"  v-model="userId" disabled="disabled"></el-input>
+          <el-input class="form-span" v-model="userId" disabled="disabled"></el-input>
         </el-form-item>
         <el-form-item label="姓名">
           <!-- <span class="form-span" >{{username}}</span> -->
@@ -16,24 +16,28 @@
           <el-input v-model="score" disabled="disabled"></el-input>
         </el-form-item>
          -->
-        <el-form-item label="相似度:" >
+        <el-form-item label="相似度:">
           <!-- <span class="form-span"  v-loading="!similarity">{{similarity}}</span> -->
           <!-- similarity -->
-          <el-input class="form-span" v-loading="!similarity" v-model="similarity" disabled="disabled"></el-input>
+          <el-input class="form-span" v-loading="isLoading" v-model="similarity" disabled="disabled"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="picCompare">比对刷新</el-button>
         </el-form-item>
-        <el-form-item label="分数">
+        <el-form-item>
+          <el-button type="primary" @click="viewEffect">查看效果</el-button>
+        </el-form-item>
+
+        <!-- <el-form-item label="分数">
           <el-input v-model="formInline.newScore" type="number"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit">评分</el-button>
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
     </div>
     <CompareCard :visitType="1" :content="content" :questionText="questionText" :comparePic="basePicUrl2"
-      :runningPic="basePicUrl" />
+      :runningPic="basePicUrl" :isLoading="isLoading" />
   </el-card>
 </template>
 
@@ -46,17 +50,24 @@ export default {
       formInline: {
         newScore: 100
       },
-      basePicUrl: null,
-      similarity: null
+      basePicUrl: 'https://source.acexy.cn/view/YPIBluo',
+      similarity: null,
+      isLoading: false
     }
   },
   components: {
     CompareCard
   },
   mounted () {
-    this.picCompare()
+    // this.picCompare()
+    if (this.autoCompare) {
+      this.picCompare()
+    }
   },
   methods: {
+    viewEffect () {
+      window.open('http://yywebsite.cn/webcheck/#/template?answerId=' + this.answerId, '_blank') // 注意第二个参数
+    },
     askForSimilarity (pic1, pic2) {
       this.axios({
         url: this.baseUrl + '/answer/compare',
@@ -78,6 +89,7 @@ export default {
       })
     },
     picCompare () {
+      this.isLoading = true
       // let pageUrl = 'http://yywebsite.cn/'
       let pageUrl = 'http://yywebsite.cn/webcheck/#/template' + '?answerId=' + this.answerId
       let width = 1024
@@ -92,6 +104,7 @@ export default {
           url: 'http://118.31.165.150:3000/api/img'
         }
       ).then((res) => {
+        this.isLoading = false
         // console.log('api/img:', res)
         if (res.data.code === 0) {
           // 获取该答案的base转码
@@ -105,6 +118,7 @@ export default {
           console.log(res.data.message)
         }
       }).catch(() => {
+        this.isLoading = false
         this.$message({
           type: 'error',
           message: '网络异常',
@@ -225,6 +239,10 @@ export default {
     basePicUrl2: {
       type: String,
       default: null
+    },
+    autoCompare: {
+      type: Boolean,
+      default: false
     }
   },
   watch: {
@@ -232,6 +250,12 @@ export default {
     content: function () { },
     score: function (val) {
       this.newScore = val
+    },
+    autoCompare: function (val) {
+      if (val === true) {
+        console.log('auto')
+        this.picCompare()
+      }
     }
   },
   computed: {
@@ -265,10 +289,9 @@ export default {
   margin-top: 10px;
 }
 
-.form-span{
+.form-span {
   display: inline-block;
-  min-width:100px;
-  max-width:150px;
+  min-width: 100px;
+  max-width: 150px;
 }
-
 </style>
