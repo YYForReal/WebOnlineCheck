@@ -7,6 +7,10 @@
             <i class="el-icon-document"></i>
             <span slot="title">已提交列表</span>
           </el-menu-item>
+          <el-menu-item index="imgs" >
+            <i class="el-icon-s-promotion"></i>
+            <span slot="title">参考图片链接</span>
+          </el-menu-item>
           <el-menu-item index="answer">
             <i class="el-icon-menu"></i>
             <span slot="title">提交答案</span>

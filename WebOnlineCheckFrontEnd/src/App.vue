@@ -22,3 +22,9 @@ export default {
   }
 }
 </script>
+
+<style>
+#app {
+  border: 0px !important;
+}
+</style>

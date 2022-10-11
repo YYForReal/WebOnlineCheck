@@ -12,6 +12,8 @@ const JudgeTable = () => import('@/components/teacher/JudgeTable')
 const ScoreList = () => import('@/components/teacher/ScoreList')
 const QuestionSetting = () => import('@/components/teacher/QuestionSetting')
 const TemplateHtml = () => import('@/components/student/TemplateHtml')
+const ImgList = () => import('@/components/student/ImgList')
+
 Vue.use(Router)// 注册vue-router
 
 export default new Router({
@@ -37,7 +39,10 @@ export default new Router({
               path: '/list',
               name: 'QuestionList',
               component: QuestionList
-
+            }, {
+              path: '/imgs',
+              name: 'ImgList',
+              component: ImgList
             }
           ]
         },

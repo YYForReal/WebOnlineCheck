@@ -1,7 +1,7 @@
 <template>
-    <div class="tempalte" v-html="htmlText">
-
-    </div>
+  <div class="template" v-html="htmlText">
+    <!-- <iframe src="" frameborder="0"></iframe> -->
+  </div>
 </template>
 <script>
 export default {
@@ -47,6 +47,16 @@ export default {
   }
 }
 </script>
-<style scoped >
+<style >
+.template {
+  margin: initial;
+  padding: initial;
+  height:100%;
+}
+
+/* .template *{
+  margin: initial;
+  padding: initial;
+} */
 
 </style>

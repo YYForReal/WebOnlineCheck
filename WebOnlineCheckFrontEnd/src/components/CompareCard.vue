@@ -29,7 +29,7 @@
           <img slot="reference" :src="comparePic" class="comp-image">
         </el-popover>
       </td>
-      <td colspan="2" v-loading="!runningPic">
+      <td colspan="2" v-loading="isLoading">
         <!-- 不使用iframe进行观察，替换为运行截图 -->
         <!-- <iframe ref="iframe"></iframe> -->
         <el-popover placement="top-start" trigger="click">
@@ -158,7 +158,11 @@ export default {
     },
     runningPic: {
       type: String,
-      default: null
+      default: 'https://source.acexy.cn/view/YPIBluo'
+    },
+    isLoading: {
+      type: Boolean,
+      defalut: false
     }
   },
   watch: {
@@ -168,7 +172,8 @@ export default {
       this.newScore = val
     },
     comparePic: function () { },
-    runningPic: function () { }
+    runningPic: function () { },
+    isLoading: function () { }
   },
   computed: {
     account () {
