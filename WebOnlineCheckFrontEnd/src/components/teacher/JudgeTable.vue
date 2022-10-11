@@ -63,7 +63,7 @@ export default {
       questionList: [],
       scanType: 0,
       ansPicUrls: [],
-      questionTexts: [],
+      // questionTexts: [],
       autoCompare: false,
       // 默认显示第几页
       currentPage: 1,
@@ -100,9 +100,9 @@ export default {
       return null
     },
     chooseQuestionText (questionId) {
-      for (let i = 0; i < this.questionTexts.length; i++) {
-        if (this.questionTexts[i].questionId === questionId) {
-          return this.questionTexts[i].questionText
+      for (let i = 0; i < this.questionList.length; i++) {
+        if (this.questionList[i].questionId === questionId) {
+          return this.questionList[i].content
         }
       }
       return null
@@ -173,10 +173,22 @@ export default {
         method: 'get'
       }).then((res) => {
         this.questionList = res.data
+        // this.refreashQuestionText()
       }).catch((err) => {
         console.log('request /question/get: ', err)
       })
     },
+    // refreashQuestionText () {
+    //   this.questionTexts = []
+    //   this.questionList.forEach(element => {
+    //     if (this.form.questionIds.indexOf(element.questionId) !== -1) {
+    //       this.questionTexts.push({
+    //         questionId: element.questionId,
+    //         questionText: element.content
+    //       })
+    //     }
+    //   })
+    // },
     changeScore (answerId, score) {
       for (let i = 0; i < this.answerList.length; i++) {
         if (this.answerList[i].answerId === answerId) {
@@ -189,16 +201,11 @@ export default {
   watch: {
     'form.questionIds': {
       handler (newIds) {
-        this.ansPicUrl = null
-        this.questionTexts = []
-        this.questionList.forEach(element => {
-          if (newIds.indexOf(element.questionId) !== -1) {
-            this.questionTexts.push({
-              questionId: element.questionId,
-              questionText: element.content
-            })
-          }
-        })
+        // this.ansPicUrl = null
+        // this.questionTexts = []
+        // console.log('newId:', newIds)
+        // console.log(this.questionList)
+        // this.refreashQuestionText()
         // this.refreshAnswerList(newId)
       }
     },
