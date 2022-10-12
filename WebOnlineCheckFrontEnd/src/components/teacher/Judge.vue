@@ -105,6 +105,7 @@ export default {
         }
       ).then((res) => {
         this.isLoading = false
+        this.$emit('completeCompare')
         // console.log('api/img:', res)
         if (res.data.code === 0) {
           // 获取该答案的base转码

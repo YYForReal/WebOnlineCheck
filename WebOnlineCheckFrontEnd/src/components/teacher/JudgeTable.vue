@@ -38,12 +38,12 @@
     </div> -->
     <div class="student-submit-box">
       <h3>学生提交</h3>
-      <div class="one-box" v-for="item in showAnswerList.slice((currentPage-1)*PageSize,currentPage*PageSize)"
+      <div class="one-box" v-for="(item,i) in showAnswerList.slice((currentPage-1)*PageSize,currentPage*PageSize)"
         :key="item.answerId">
         <JudgeVue :answerId="item.answerId" :content="item.content" :score="item.score"
           :questionText="chooseQuestionText(item.questionId)" :userId="item.userId" :username="item.username"
           @changeScore="changeScore" :questionId="item.questionId" :basePicUrl2="chooseAnsPicUrl(item.questionId)"
-          :autoCompare="autoCompare" />
+          :autoCompare="(autoCompare && canCompareNumber>=i)" @completeCompare="completeCompare" />
       </div>
     </div>
   </div>
@@ -65,19 +65,23 @@ export default {
       ansPicUrls: [],
       // questionTexts: [],
       autoCompare: false,
+      canCompareNumber: 0,
       // 默认显示第几页
       currentPage: 1,
       // 个数选择器（可修改）
-      pageSizes: [10, 20, 30, 40],
+      pageSizes: [10, 20, 30, 40, 50, 60, 80, 100],
       // 默认每页显示的条数（可修改）
       PageSize: 10
-
     }
   },
   mounted () {
     this.refreshQuestionList()
   },
   methods: {
+    // 可以比对的图像数量
+    completeCompare () {
+      this.canCompareNumber++
+    },
     // 分页
     // 每页显示的条数
     handleSizeChange (val) {
@@ -92,8 +96,10 @@ export default {
       this.currentPage = val
     },
     chooseAnsPicUrl (questionId) {
+      console.log('choise ans:', this.ansPicUrls)
       for (let i = 0; i < this.ansPicUrls.length; i++) {
         if (this.ansPicUrls[i].questionId === questionId) {
+          console.log('check', this.ansPicUrls[i].image)
           return this.ansPicUrls[i].image
         }
       }
@@ -110,42 +116,49 @@ export default {
     getQuestionBase () {
       return this.ansPicUrl
     },
+    askPicPromise () {
+      return new Promise((resolve, reject) => {
 
+      })
+    },
     askPictureUrl () {
-      for (let i = 0; i < this.form.questionIds.length; i++) {
-        let pageUrl = 'http://yywebsite.cn/webcheck/#/template?questionId=' + this.form.questionIds[i]
-        let width = 1024
-        let height = 768
-        let timeout = 40000
-        let delay = 500
-        this.axios(
-          {
-            method: 'POST',
-            headers: { 'content-type': 'application/x-www-form-urlencoded' },
-            data: `pageUrl=${pageUrl}&width=${width}&height=${height}&timeout=${timeout}&delay=${delay}`,
-            url: 'http://118.31.165.150:3000/api/img'
-          }
-        ).then((res) => {
-          // console.log('question api/img:', res)
-          if (res.data.code === 0) {
-            this.ansPicUrls.push({
-              questionId: this.form.questionIds[i],
-              image: res.data.data.image
+      this.ansPicUrls = []
+      for (let i = 0; i < this.questionList.length; i++) {
+        setTimeout(() => {
+          let pageUrl = 'http://yywebsite.cn/webcheck/#/template?questionId=' + this.questionList[i].questionId
+          let width = 1024
+          let height = 768
+          let timeout = 40000
+          let delay = 500
+          this.axios(
+            {
+              method: 'POST',
+              headers: { 'content-type': 'application/x-www-form-urlencoded' },
+              data: `pageUrl=${pageUrl}&width=${width}&height=${height}&timeout=${timeout}&delay=${delay}`,
+              url: 'http://118.31.165.150:3000/api/img'
+            }
+          ).then((res) => {
+            if (res.data.code === 0) {
+              console.log('push', this.ansPicUrls)
+              this.ansPicUrls.push({
+                questionId: this.questionList[i].questionId,
+                image: res.data.data.image
+              })
+            } else {
+              console.log(res.data.message)
+            }
+          }).catch(() => {
+            this.$message({
+              type: 'error',
+              message: '网络异常',
+              showClose: true
             })
-          } else {
-            console.log(res.data.message)
-          }
-        }).catch(() => {
-          this.$message({
-            type: 'error',
-            message: '网络异常',
-            showClose: true
           })
-        })
+        }, i * 1000)
       }
     },
     refreshAnswerList () {
-      this.askPictureUrl()
+      // this.askPictureUrl()
       let requestUrl = this.baseUrl + '/answer/multi-get?questionIds=' + this.form.questionIds
       if (this.form.userId) {
         requestUrl += ('&userId=' + this.form.userId)
@@ -174,6 +187,7 @@ export default {
       }).then((res) => {
         this.questionList = res.data
         // this.refreashQuestionText()
+        this.askPictureUrl()
       }).catch((err) => {
         console.log('request /question/get: ', err)
       })
@@ -209,10 +223,17 @@ export default {
         // this.refreshAnswerList(newId)
       }
     },
-
+    ansPicUrls: {
+      deep: true
+    },
     answerList: {
       handler () { },
       deep: true
+    },
+    autoCompare: {
+      handler () {
+        this.canCompareNumber = 0
+      }
     }
   },
   components: {
