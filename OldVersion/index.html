@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实验html文字校对</title>
+    <style type="text/css">
+        table { width: 100%; height: 500px; margin-top: 0px; }
+        tr { flex-direction: row; display: -webkit-flex; display: flex; height: 100%; -webkit-flex-wrap: wrap; flex-wrap: wrap; }
+        tr td { width: 33%; border: 1px solid #000000e6;  overflow-wrap: anywhere; }
+        del { background: #ff0000bf; text-decoration: none; }
+        ins { background: #00ff22c7; text-decoration: none;}
+        iframe{ width: 100%; height: 500px; overflow: scroll; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>实验html文字校对</h1>
+    </header>
+    <div class="input_box">
+        比对的文本文件(txt)：<input type="file" name="source" accept=".txt">
+    </div>
+    <div class="input_box">
+        比对的页面文件(html)：<input type="file" name="target" accept=".html">
+    </div>
+
+    <table>
+        <tr>
+            <td id="a">此处显示比对的文本内容</td>
+            <td id="b">此处显示过滤后的比对html内容</td>
+            <td><div id="result">此处显示比对结果</div></td>
+        </tr>
+    </table>
+
+    <iframe id="iframe" src="" frameborder="0"></iframe>
+
+    <div class="input_box">
+        <h4>结果</h4> 
+        <p id="result_text">当前暂无操作</p>
+    </div>
+
+    <script src="diff.js"></script>
+    <script src="script.js"></script>
+    </body>
+</html>
