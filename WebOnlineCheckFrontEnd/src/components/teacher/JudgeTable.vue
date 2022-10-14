@@ -12,20 +12,20 @@
           </el-select>
         </el-form-item>
         <el-form-item prop="username" height="60px">
-          <el-input type="text" v-model="form.username" placeholder="姓名(可选)（回车搜索）"
-            @keyup.enter.native="refreshAnswerList">
+          <el-input type="text" v-model="form.username" placeholder="姓名（回车搜索）" @keyup.enter.native="refreshAnswerList">
           </el-input>
         </el-form-item>
         <el-form-item prop="userid">
-          <el-input type="text" v-model="form.userId" placeholder="学号（可选）（回车搜索）"
-            @keyup.enter.native="refreshAnswerList">
+          <el-input type="text" v-model="form.userId" placeholder="学号（回车搜索）" @keyup.enter.native="refreshAnswerList">
           </el-input>
         </el-form-item>
         <el-form-item>
           一键比对
           <el-switch v-model="autoCompare" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
         </el-form-item>
+
         <el-button type="primary" @click="refreshAnswerList">搜索</el-button>
+
       </el-form>
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage"
         :page-sizes="pageSizes" :page-size="PageSize" layout="total, sizes, prev, pager, next, jumper"
@@ -65,7 +65,9 @@ export default {
       ansPicUrls: [],
       // questionTexts: [],
       autoCompare: false,
-      canCompareNumber: 0,
+      compareAnswerNumber: 0, // 当前比较的参考运行截图序号
+      canCompareNumber: 0, // 当前比较的运行截图序号
+      isSending: false,
       // 默认显示第几页
       currentPage: 1,
       // 个数选择器（可修改）
@@ -75,7 +77,13 @@ export default {
     }
   },
   mounted () {
-    this.refreshQuestionList()
+    this.compareAnswerNumber = 0
+    setTimeout(() => {
+      if (this.isSending === false) {
+        this.isSending = true
+        this.refreshQuestionList()
+      }
+    }, 500)
   },
   methods: {
     // 可以比对的图像数量
@@ -96,10 +104,10 @@ export default {
       this.currentPage = val
     },
     chooseAnsPicUrl (questionId) {
-      console.log('choise ans:', this.ansPicUrls)
+      // console.log('choise ans:', this.ansPicUrls)
       for (let i = 0; i < this.ansPicUrls.length; i++) {
         if (this.ansPicUrls[i].questionId === questionId) {
-          console.log('check', this.ansPicUrls[i].image)
+          // console.log('check', this.ansPicUrls[i].image)
           return this.ansPicUrls[i].image
         }
       }
@@ -113,49 +121,102 @@ export default {
       }
       return null
     },
-    getQuestionBase () {
-      return this.ansPicUrl
+    checkIsExist (questionId) {
+      for (let i = 0; i < this.ansPicUrls.length; i++) {
+        if (this.ansPicUrls[i].questionId === questionId) {
+          return true
+        }
+      }
+      return false
     },
-    askPicPromise () {
+    askOnePic (questionId) {
+      const ansUrls = this.ansPicUrls
       return new Promise((resolve, reject) => {
-
+        let pageUrl = 'http://yywebsite.cn/webcheck/#/template?questionId=' + questionId
+        let width = 1024
+        let height = 768
+        let timeout = 40000
+        let delay = 500
+        this.axios(
+          {
+            method: 'POST',
+            headers: { 'content-type': 'application/x-www-form-urlencoded' },
+            data: `pageUrl=${pageUrl}&width=${width}&height=${height}&timeout=${timeout}&delay=${delay}`,
+            url: 'http://118.31.165.150:3000/api/img'
+          }
+        ).then((res) => {
+          if (res.data.code === 0) {
+            console.log('push', this.ansPicUrls)
+            this.compareAnswerNumber++
+            ansUrls.push({
+              questionId: questionId,
+              image: res.data.data.image
+            })
+            if (this.compareAnswerNumber < this.questionList.length) {
+              this.askOnePic(this.questionList[this.compareAnswerNumber].questionId)
+            }
+          } else if (res.data.code === 99999) {
+            this.$message({
+              type: 'warning',
+              message: '请求量过大，请稍后再试',
+              showClose: true
+            })
+          } else {
+            console.log(res.data.message)
+          }
+        }).catch(() => {
+          this.$message({
+            type: 'error',
+            message: '网络异常',
+            showClose: true
+          })
+        })
       })
     },
     askPictureUrl () {
       this.ansPicUrls = []
-      for (let i = 0; i < this.questionList.length; i++) {
-        setTimeout(() => {
-          let pageUrl = 'http://yywebsite.cn/webcheck/#/template?questionId=' + this.questionList[i].questionId
-          let width = 1024
-          let height = 768
-          let timeout = 40000
-          let delay = 500
-          this.axios(
-            {
-              method: 'POST',
-              headers: { 'content-type': 'application/x-www-form-urlencoded' },
-              data: `pageUrl=${pageUrl}&width=${width}&height=${height}&timeout=${timeout}&delay=${delay}`,
-              url: 'http://118.31.165.150:3000/api/img'
-            }
-          ).then((res) => {
-            if (res.data.code === 0) {
-              console.log('push', this.ansPicUrls)
-              this.ansPicUrls.push({
-                questionId: this.questionList[i].questionId,
-                image: res.data.data.image
-              })
-            } else {
-              console.log(res.data.message)
-            }
-          }).catch(() => {
-            this.$message({
-              type: 'error',
-              message: '网络异常',
-              showClose: true
-            })
-          })
-        }, i * 1000)
-      }
+      this.askOnePic(this.questionList[this.compareAnswerNumber].questionId)
+      // for (let i = 0; i < this.questionList.length; i++) {
+      //   if (this.questionList != null) {
+      //     setTimeout(() => {
+      //       let pageUrl = 'http://yywebsite.cn/webcheck/#/template?questionId=' + this.questionList[i].questionId
+      //       let width = 1024
+      //       let height = 768
+      //       let timeout = 40000
+      //       let delay = 500
+      //       this.axios(
+      //         {
+      //           method: 'POST',
+      //           headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      //           data: `pageUrl=${pageUrl}&width=${width}&height=${height}&timeout=${timeout}&delay=${delay}`,
+      //           url: 'http://118.31.165.150:3000/api/img'
+      //         }
+      //       ).then((res) => {
+      //         if (res.data.code === 0) {
+      //           console.log('push', this.ansPicUrls)
+      //           this.ansPicUrls.push({
+      //             questionId: this.questionList[i].questionId,
+      //             image: res.data.data.image
+      //           })
+      //         } else if (res.data.code === 99999) {
+      //           this.$message({
+      //             type: 'warning',
+      //             message: '请求量过大，请稍后再试',
+      //             showClose: true
+      //           })
+      //         } else {
+      //           console.log(res.data.message)
+      //         }
+      //       }).catch(() => {
+      //         this.$message({
+      //           type: 'error',
+      //           message: '网络异常',
+      //           showClose: true
+      //         })
+      //       })
+      //     }, i * 2000)
+      //   }
+      // }
     },
     refreshAnswerList () {
       // this.askPictureUrl()
@@ -232,6 +293,10 @@ export default {
     },
     autoCompare: {
       handler () {
+        if (this.questionList.length === 0 && this.isSending === false) {
+          this.refreshQuestionList()
+          this.isSending = true
+        }
         this.canCompareNumber = 0
       }
     }

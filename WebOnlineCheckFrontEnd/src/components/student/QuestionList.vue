@@ -53,7 +53,6 @@
 <script>
 import { MyFilter } from '@/utils/myFilter.js'
 import CompareCardVue from '../CompareCard.vue'
-import md5 from 'js-md5'
 export default {
   name: 'QuestionList',
   data () {
@@ -73,14 +72,21 @@ export default {
   },
   mounted () {
     if (this.account === null || this.account === undefined) {
-      this.$router.push('/login')
+      let storage = sessionStorage.getItem('web-account')
+      let obj = JSON.parse(storage)
+      if (storage == null || obj.username == null || obj.userid == null) {
+        this.$router.push('/login')
+      } else {
+        this.$store.dispatch('handleLogin', obj).then(() => {
+          this.refreshSubmitList()
+        })
+      }
     }
-    this.refreshSubmitList()
   },
   methods: {
     viewEffect (answerId) {
-      window.open('http://yywebsite.cn/webcheck/#/template?answerId=' + answerId + '&userId=' + md5(this.account.userid), '_blank') // 注意第二个参数
-      // window.open('http://localhost:8081/#/template?answerId=' + answerId + '&userId=' + md5(this.account.userid), '_blank') // 注意第二个参数
+      window.open('http://yywebsite.cn/webcheck/#/template?answerId=' + answerId + '&userId=' + this.$md5(this.account.userid), '_blank') // 注意第二个参数
+      // window.open('http://localhost:8081/#/template?answerId=' + answerId + '&userId=' + this.$md5(this.account.userid), '_blank') // 注意第二个参数
     },
     formatTime (str) {
       return MyFilter.dateFormat(str)

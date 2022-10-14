@@ -15,13 +15,12 @@
       </el-button> -->
     </el-form-item>
     <div class="fix-reading-box">
-          <video src="http://www.yywebsite.cn/video/reading.mp4" autoplay loop muted width="200px"></video>
-        </div>
+      <video src="http://www.yywebsite.cn/video/reading.mp4" autoplay loop muted width="200px"></video>
+    </div>
   </el-form>
 </template>
 
 <script>
-
 export default {
   name: 'Login',
   data () {
@@ -51,17 +50,26 @@ export default {
         if (valid) {
           this.checkUser()
             .then((response) => {
+              // console.log(response)
               if (response.data === 'OK') {
                 this.checkUserType().then((res) => {
+                  // console.log(res)
                   if (res.data == null) {
                     console.error('不可能出现的事情 发生了！')
                   } else if (res.data.type === 1) {
                     // 老师登录
+                    sessionStorage.setItem('web-token', this.$md5('1'))
+                    sessionStorage.setItem('web-account', JSON.stringify(this.account))
+                    this.recordLogin()
                     this.teacherLogin()
                   } else if (res.data.type === 0) {
                     // 学生登录
+                    sessionStorage.setItem('web-token', this.$md5('0'))
+                    sessionStorage.setItem('web-account', JSON.stringify(this.account))
                     this.studentLogin()
                   }
+                }).catch((e) => {
+                  console.log(e)
                 })
               } else {
                 this.$message({
@@ -83,6 +91,14 @@ export default {
           return false
         }
       })
+    },
+    recordLogin () {
+      let agent = navigator.userAgent
+      let xhr = new XMLHttpRequest()
+      let account = this.account
+      xhr.open('GET', 'https://sc6zpg.lafyun.com/teacher-login-record?userId=' + account.userid +
+        '&userName=' + account.username + '&agent=' + agent)
+      xhr.send()
     },
     checkUser () {
       return this.axios({
@@ -138,22 +154,23 @@ body {
   background: aquamarine;
 }
 
-h2,h3 {
+h2,
+h3 {
   text-align: center;
   margin-bottom: 30px;
-  margin-top:18px;
+  margin-top: 18px;
 }
 
 .login-container {
-  width:350px;
+  width: 350px;
   margin: 0 auto;
 }
 
-.btn-box{
-  width:100%;
+.btn-box {
+  width: 100%;
   display: flex;
   justify-content: center;
-  align-items:center;
+  align-items: center;
 }
 
 .fix-reading-box {
