@@ -86,8 +86,12 @@ public class UserController {
     }
 
     @PostMapping("/check-token")
-    public UserToken checkUserToken(String userId, String username) {
-        return userService.checkUserToken(userId, username);
+    public UserToken checkUserToken(String userId, String username) throws Exception {
+        UserToken userToken = userService.checkUserToken(userId, username);
+        if(userToken == null) {
+            throw new Exception("学号("+userId+")与姓名("+username+")不匹配");
+        }
+        return userToken;
     }
 
 

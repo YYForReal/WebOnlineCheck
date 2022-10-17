@@ -32,6 +32,13 @@ public class AnswerService {
         return list;
     }
 
+    public List<Answer> getAnswersByIds(Integer[] questionId,String userId,String username) {
+        userId = "%" + userId + "%";
+        username = "%" + username + "%";
+        List<Answer> list = answerDao.getAnswersByIds(questionId,userId,username);
+        return list;
+    }
+
 
 
     public boolean judgeScore(Integer answerId, Integer score) {

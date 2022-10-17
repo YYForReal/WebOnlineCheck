@@ -1,15 +1,21 @@
 package com.hyy.webcheck.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.hyy.webcheck.bean.QuestionWithScore;
 import com.hyy.webcheck.bean.User;
 import com.hyy.webcheck.bean.UserScore;
 import com.hyy.webcheck.bean.UserToken;
 import com.hyy.webcheck.service.AnswerDao;
 import com.hyy.webcheck.service.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class UserService {
@@ -19,6 +25,9 @@ public class UserService {
 
     @Autowired
     AnswerDao answerDao;
+
+    @Autowired
+    RedisTemplate<String,String> redisTemplate;
 
 
     public List<String> getAllUserId() {
@@ -49,6 +58,7 @@ public class UserService {
 
 
     public User getUserInfoById(String userId) {
+
         return userDao.getUserInfoById(userId);
     }
 
@@ -108,7 +118,19 @@ public class UserService {
     }
 
     public UserToken checkUserToken(String userId, String username) {
-        return userDao.checkUserToken(userId,username) ;
+        UserToken userToken;
+        String str = redisTemplate.opsForValue().get(userId+"_"+username);
+        if(str == null){
+            // 从数据库拿，放Redis里面
+            userToken = userDao.checkUserToken(userId,username) ;
+            str = JSON.toJSONString(userToken);
+            redisTemplate.opsForValue().set(userId+"_"+username, str);
+            redisTemplate.expire(userId+"_"+username,1, TimeUnit.DAYS);
+        }else {
+            //从Redis拿
+            userToken = JSON.parseObject(str,UserToken.class);
+        }
+        return userToken;
     }
 
 }

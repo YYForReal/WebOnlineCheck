@@ -27,6 +27,16 @@ public class AnswerController {
         return list;
     }
 
+    //根据问题id获取对应的所有学生回答
+    @GetMapping("/multi-get")
+    public List<Answer> getAnswersByIds(@RequestParam(value = "questionIds") Integer [] questionIds,
+                           @RequestParam(value = "userId",defaultValue = "") String userId,
+                           @RequestParam(value = "username",defaultValue = "") String username) {
+        List<Answer> list = answerService.getAnswersByIds(questionIds,userId,username);
+        return list;
+    }
+
+
     //回答评分
     @PostMapping("/score")
     public String judgeScore(Integer answerId, Integer score,String userId,String username) {

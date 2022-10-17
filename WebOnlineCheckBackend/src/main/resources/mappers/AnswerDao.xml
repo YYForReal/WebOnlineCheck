@@ -11,6 +11,7 @@
                answers.release_time as 'releaseTime',
                answers.update_time  as 'updateTime',
                answers.score,
+               answers.question_id as 'questionId',
                answers.show_times   as 'showTimes',
                users.username       as 'username',
                users.description    as 'authorDescription',
@@ -19,6 +20,35 @@
                  inner join users on answers.user_id = users.user_id
         where answers.question_id = #{questionId}
     </select>
+
+    <select id="getAnswersByIds" resultType="com.hyy.webcheck.bean.Answer">
+        select
+            answers.answer_id    as 'answerId',
+            answers.user_id    as 'userId',
+            answers.content,
+            answers.release_time as 'releaseTime',
+            answers.update_time  as 'updateTime',
+            answers.score,
+            answers.question_id as 'questionId',
+            answers.show_times   as 'showTimes',
+            users.username       as 'username',
+            users.description    as 'authorDescription',
+            users.avatar         as 'authorAvatar'
+        from answers
+        inner join users on answers.user_id = users.user_id
+        where
+        answers.user_id like #{userId}  and
+        users.username like #{username}
+        <if test="array !=null and array.length > 0">
+            and answers.question_id in
+            <foreach collection="array" item = "qid" open="(" separator="," close=")" index="index">
+                #{qid}
+            </foreach>
+        </if>
+    </select>
+
+
+
 
 
     <select id="getAllScoreByStudent"  resultType="com.hyy.webcheck.bean.Answer">
@@ -35,9 +65,9 @@
                     (
                             now() > date_add( answers.update_time, INTERVAL 3 DAY )
                         AND (
-                                        now() > date_add( answers.update_time, INTERVAL 6 DAY )
-                                    OR now() > date_add( question.update_time, INTERVAL 6 DAY )
-                                ),
+                            now() > date_add( answers.update_time, INTERVAL 6 DAY )
+                            OR now() > date_add( question.release_time, INTERVAL 6 DAY )
+                            ),
                         question.content,
                         NULL
                     ) AS 'compareText'

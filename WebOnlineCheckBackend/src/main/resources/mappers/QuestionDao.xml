@@ -40,21 +40,21 @@
 
 
 
-    <!--增加回答-->
+    <!--增加问题-->
     <insert id="postQuestion">
-        insert into question(title,  content ,user_id, release_time, update_time)
-        values (#{title}, #{content}, #{userId}, #{releaseTime}, #{releaseTime});
+        insert into question(title,  content ,user_id, html , release_time, update_time)
+        values (#{title}, #{content}, #{userId} , #{html}, #{releaseTime}, #{releaseTime});
     </insert>
 
     <select id="getQuestionsWithAllStudentsScore" resultType="com.hyy.webcheck.bean.Question">
         SELECT
             question.question_id AS 'questionId',
-                question.user_id AS 'userId',
-                question.title,
+            question.user_id AS 'userId',
+            question.title,
             question.content,
             question.release_time AS 'releaseTime',
-                question.update_time AS 'updateTime',
-                users.username AS 'username'
+            question.update_time AS 'updateTime',
+            users.username AS 'username'
         FROM
             question,
             users
@@ -77,7 +77,7 @@
 
     <update id="updateQuestion">
         update question
-        SET title=#{title}, content= #{content},update_time = #{updateTime},user_id = #{userId}
+        SET title=#{title}, content= #{content},update_time = #{updateTime},user_id = #{userId},html=#{html}
         WHERE question_id = #{questionId}
     </update>
 

@@ -50,14 +50,14 @@ public class QuestionController {
 
     //上传文章
     @PostMapping("/post")
-    public Result<Boolean> postQuestion(String title, String content, String userId,String username) {
-        return questionService.postQuestion(title,content,userId,username);
+    public Result<Boolean> postQuestion(String title, String content, String userId,String username,String html) {
+        return questionService.postQuestion(title,content,userId,username,html);
     }
 
     @PostMapping("/update")
     public Result<Boolean> updateQuestion(Integer questionId, String title, String content,
-                                          String userId,String username) {
-        return questionService.updateQuestion(questionId,title,content,userId,username);
+                                          String userId,String username,String html) {
+        return questionService.updateQuestion(questionId,title,content,userId,username,html);
     }
 
     @PostMapping("/delete")

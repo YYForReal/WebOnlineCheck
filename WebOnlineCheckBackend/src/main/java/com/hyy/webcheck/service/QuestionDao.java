@@ -21,13 +21,14 @@ public interface QuestionDao {
     String searchQuestion(@Param("questionId") Integer questionId);
 
     Integer postQuestion(@Param("title") String title, @Param("content") String content,
-                         @Param("userId") String userId, @Param("releaseTime") String dateTime);
+                         @Param("userId") String userId, @Param("releaseTime") String dateTime,
+                         @Param("html") String html);
 
     List<UserOneScore> getUserScoreList(@Param("questionId") Integer questionId);
 
     Integer updateQuestion(@Param("questionId") Integer questionId, @Param("title") String title,
                            @Param("content") String content, @Param("userId") String userId,
-                           @Param("updateTime") String dateTime);
+                           @Param("updateTime") String dateTime,@Param("html") String html);
 
     Integer deleteQuestion(@Param("questionId") Integer questionId);
 

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hyy.webcheck.service.ImgDao">
+
+    <select id="searchImg" resultType="com.hyy.webcheck.bean.Img">
+        SELECT
+            img.img_id AS 'imgId',
+            img.question_id AS 'questionId',
+            question.title AS 'questionTitle',
+            img.url AS 'url'
+        FROM
+            img
+        LEFT JOIN question on img.question_id = question.question_id
+
+    </select>
+
+    <!--增加图片-->
+    <insert id="addImg">
+        insert into img(question_id,url)
+        values (#{questionId}, #{url});
+    </insert>
+
+    <!--修改图片-->
+    <update id="updateImg">
+        update img
+        SET url=#{url}, question_id= #{questionId}
+        WHERE img_id = #{imgId}
+    </update>
+
+
+    <delete id="deleteImg" parameterType="Integer">
+        delete from img
+        where img_id = #{imgId}
+    </delete>
+
+</mapper>
