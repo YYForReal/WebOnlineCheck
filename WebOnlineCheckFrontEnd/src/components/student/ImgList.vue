@@ -19,7 +19,7 @@
 export default {
   data () {
     return {
-      imgList: []
+      imgList: null
     }
   },
   mounted () {
@@ -53,8 +53,10 @@ export default {
         url: this.baseUrl + '/img/list',
         method: 'get'
       }).then((res) => {
-        this.imgList = res.data.data
-        console.log(this.imgList)
+        if (res.data && this) {
+          this.imgList = res.data.data
+        }
+        // console.log(this.imgList)
       }).catch((err) => {
         console.log('search /img/list: ', err)
       })
@@ -62,6 +64,7 @@ export default {
   },
   watch: {
     imgList: {
+      handler () {},
       deep: true
     }
   }

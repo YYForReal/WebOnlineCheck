@@ -166,8 +166,7 @@ export default {
     }
   },
   watch: {
-    content: function () {
-    },
+    content: function () {},
     score: function (val) {
       this.newScore = val
     },

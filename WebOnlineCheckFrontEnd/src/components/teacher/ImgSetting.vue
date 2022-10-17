@@ -241,6 +241,7 @@ export default {
   },
   watch: {
     imgList: {
+      handler () {},
       deep: true
     }
   }

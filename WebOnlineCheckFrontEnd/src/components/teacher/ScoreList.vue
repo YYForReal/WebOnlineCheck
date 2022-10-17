@@ -89,9 +89,11 @@ export default {
   },
   watch: {
     studentList: {
+      handler () { },
       deep: true
     },
     questionList: {
+      handler () { },
       deep: true
     }
   }
