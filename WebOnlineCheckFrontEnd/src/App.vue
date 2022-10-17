@@ -26,5 +26,14 @@ export default {
 <style>
 #app {
   border: 0px !important;
+  width:100%;
+  height: initial!important;
+  margin: initial!important;
+  margin-top: initial!important;
+  margin-left: initial!important;
+  margin-right: initial!important;
+  margin-bottom: initial!important;
+  padding: initial!important;
+  min-height: 800px;
 }
 </style>
