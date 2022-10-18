@@ -58,7 +58,8 @@ export default {
       form: {
         questionIds: null,
         userId: null,
-        username: null
+        username: null,
+        timer: null// 记录最后更改实验列表的定时器
       },
       questionList: [],
       scanType: 0,
@@ -68,6 +69,8 @@ export default {
       compareAnswerNumber: 0, // 当前比较的参考运行截图序号
       canCompareNumber: 0, // 当前比较的运行截图序号
       isSending: false,
+      canAskQuestionPic: false,
+
       // 默认显示第几页
       currentPage: 1,
       // 个数选择器（可修改）
@@ -154,8 +157,8 @@ export default {
               questionId: questionId,
               image: res.data.data.image
             })
-            if (this.compareAnswerNumber < this.questionList.length) {
-              this.askOnePic(this.questionList[this.compareAnswerNumber].questionId)
+            if (this.compareAnswerNumber < this.questionPicList.length) {
+              this.askOnePic(this.questionPicList[this.compareAnswerNumber].questionId)
             }
           } else if (res.data.code === 99999) {
             this.$message({
@@ -177,7 +180,8 @@ export default {
     },
     askPictureUrl () {
       this.ansPicUrls = []
-      this.askOnePic(this.questionList[this.compareAnswerNumber].questionId)
+      this.compareAnswerNumber = 0
+      this.askOnePic(this.questionPicList[this.compareAnswerNumber].questionId)
       // for (let i = 0; i < this.questionList.length; i++) {
       //   if (this.questionList != null) {
       //     setTimeout(() => {
@@ -221,7 +225,11 @@ export default {
       // }
     },
     refreshAnswerList () {
-      // this.askPictureUrl()
+      // 如果当前已经刷新出了问题列表，且未选择问题，对所有的问题都进行一次图片比对
+      if (this.canAskQuestionPic === true && (this.form.questionIds == null || this.form.questionIds.length === 0)) {
+        this.askPictureUrl()
+      }
+      // 获取答案列表
       let requestUrl = this.baseUrl + '/answer/multi-get?questionIds=' + this.form.questionIds
       if (this.form.userId) {
         requestUrl += ('&userId=' + this.form.userId)
@@ -249,8 +257,8 @@ export default {
         method: 'get'
       }).then((res) => {
         this.questionList = res.data
-        // this.refreashQuestionText()
-        this.askPictureUrl()
+        this.canAskQuestionPic = true
+        // this.askPictureUrl()
       }).catch((err) => {
         console.log('request /question/get: ', err)
       })
@@ -277,17 +285,20 @@ export default {
 
   watch: {
     'form.questionIds': {
-      handler (newIds) {
-        // this.ansPicUrl = null
-        // this.questionTexts = []
-        // console.log('newId:', newIds)
-        // console.log(this.questionList)
-        // this.refreashQuestionText()
-        // this.refreshAnswerList(newId)
+      handler (val) {
+        console.log('newIds', val)
+        if (val == null || val.length === 0) { return }
+        if (this.form.timer != null) {
+          clearTimeout(this.form.timer)
+        }
+        this.form.timer = setTimeout(() => {
+          this.askPictureUrl()
+          this.form.timer = null
+        }, 2000)
       }
     },
     ansPicUrls: {
-      handler () {},
+      handler () { },
       deep: true
     },
     answerList: {
@@ -321,6 +332,21 @@ export default {
         }
         return idFlag && nameFlag
       })
+    },
+    questionPicList () {
+      if (this.form.questionIds == null || this.form.questionIds.length === 0) {
+        console.log('questionPicList get from questionList')
+        return this.questionList
+      } else {
+        let res = []
+        for (let i = 0; i < this.form.questionIds.length; i++) {
+          res.push({
+            questionId: this.form.questionIds[i]
+          })
+        }
+        console.log('questionPicList get from questionIds', res)
+        return res
+      }
     },
     totalCount () {
       if (this.answerList == null) return 0
