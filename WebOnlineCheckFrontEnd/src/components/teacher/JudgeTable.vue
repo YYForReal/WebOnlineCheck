@@ -97,11 +97,13 @@ export default {
       this.PageSize = val
       // 注意：在改变每页显示的条数时，要将页码显示到第一页
       this.currentPage = 1
+      this.canCompareNumber = 0
     },
     // 显示第几页
     handleCurrentChange (val) {
       // 改变默认的页数
       this.currentPage = val
+      this.canCompareNumber = 0
     },
     chooseAnsPicUrl (questionId) {
       // console.log('choise ans:', this.ansPicUrls)
@@ -141,7 +143,7 @@ export default {
           {
             method: 'POST',
             headers: { 'content-type': 'application/x-www-form-urlencoded' },
-            data: `pageUrl=${pageUrl}&width=${width}&height=${height}&timeout=${timeout}&delay=${delay}`,
+            data: `pageUrl=${pageUrl}&width=${width}&height=${height}&timeout=${timeout}&delay=${delay}&element=html`,
             url: 'http://118.31.165.150:3000/api/img'
           }
         ).then((res) => {
@@ -285,6 +287,7 @@ export default {
       }
     },
     ansPicUrls: {
+      handler () {},
       deep: true
     },
     answerList: {
@@ -293,11 +296,11 @@ export default {
     },
     autoCompare: {
       handler () {
+        this.canCompareNumber = 0
         if (this.questionList.length === 0 && this.isSending === false) {
           this.refreshQuestionList()
           this.isSending = true
         }
-        this.canCompareNumber = 0
       }
     }
   },
