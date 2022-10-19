@@ -92,10 +92,10 @@ export default {
       this.isLoading = true
       // let pageUrl = 'http://yywebsite.cn/'
       let pageUrl = 'http://yywebsite.cn/webcheck/#/template' + '?answerId=' + this.answerId
-      let width = 1024
-      let height = 768
+      let width = this.compareSetting.width
+      let height = this.compareSetting.height
       let timeout = 40000
-      let delay = 500
+      let delay = this.compareSetting.delay
       this.axios(
         {
           method: 'POST',
@@ -113,7 +113,7 @@ export default {
           console.log('图像的base转码为:', this.basePicUrl)
           // 获取问题的base转码
           // this.basePicUrl2 = this.$emit('getQuestionBase')
-          console.log('答案的base转码为:', this.basePicUrl2)
+          // console.log('答案的base转码为:', this.basePicUrl2)
           this.askForSimilarity(this.basePicUrl, this.basePicUrl2)
         } else {
           console.log(res.data.message)
@@ -244,6 +244,16 @@ export default {
     autoCompare: {
       type: Boolean,
       default: false
+    },
+    compareSetting: {
+      type: Object,
+      default () {
+        return {
+          width: 1440,
+          height: 960,
+          delay: 500
+        }
+      }
     }
   },
   watch: {

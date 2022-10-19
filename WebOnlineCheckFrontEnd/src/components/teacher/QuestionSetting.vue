@@ -37,10 +37,10 @@
       <el-input v-model="form.title" :disabled="form.isDelete"></el-input>
     </el-form-item>
     <el-form-item label="比对文本" :label-width="formLabelWidth" >
-      <el-input v-model="form.content"  type="textarea"  :disabled="form.isDelete" ></el-input>
+      <el-input v-model="form.content"  type="textarea" :rows="8"  :disabled="form.isDelete" ></el-input>
     </el-form-item>
     <el-form-item label="比对HTML" :label-width="formLabelWidth" >
-      <el-input v-model="form.html"  type="textarea"  :disabled="form.isDelete" ></el-input>
+      <el-input v-model="form.html"  type="textarea"  :rows="8" :disabled="form.isDelete" ></el-input>
     </el-form-item>
 
     <!-- <el-form-item label="CSS属性" v-for="(attribute,index) in form.attributes" :key="index" :label-width="formLabelWidth" >

@@ -19,12 +19,9 @@
           <el-input type="text" v-model="form.userId" placeholder="学号（回车搜索）" @keyup.enter.native="refreshAnswerList">
           </el-input>
         </el-form-item>
-        <el-form-item>
-          一键比对
-          <el-switch v-model="autoCompare" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
-        </el-form-item>
+        <el-button type="info" round @click="compareSettingVisible = true">截图配置</el-button>
 
-        <el-button type="primary" @click="refreshAnswerList">搜索</el-button>
+        <el-button type="primary" icon="el-icon-search" round @click="refreshAnswerList">搜索</el-button>
 
       </el-form>
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage"
@@ -43,9 +40,31 @@
         <JudgeVue :answerId="item.answerId" :content="item.content" :score="item.score"
           :questionText="chooseQuestionText(item.questionId)" :userId="item.userId" :username="item.username"
           @changeScore="changeScore" :questionId="item.questionId" :basePicUrl2="chooseAnsPicUrl(item.questionId)"
-          :autoCompare="(autoCompare && canCompareNumber>=i)" @completeCompare="completeCompare" />
+          :autoCompare="(autoCompare && canCompareNumber>=i)" @completeCompare="completeCompare"
+          :compareSetting="compareSetting" />
       </div>
     </div>
+    <!-- :before-close="handleClose" -->
+    <el-dialog title="截图配置" :visible.sync="compareSettingVisible" width="50%" >
+      <el-form>
+        <el-form-item label="一键比对">
+          <el-switch v-model="autoCompare" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+        </el-form-item>
+        <el-form-item label="模拟浏览器宽度（单位：px）">
+          <el-input type="number" v-model="compareSetting.width" placeholder="图像宽度" @keyup.enter.native="compareSettingVisible = false" ></el-input>
+        </el-form-item>
+        <el-form-item label="模拟浏览器高度（单位：px）">
+          <el-input type="number" v-model="compareSetting.height" placeholder="图像高度" @keyup.enter.native="compareSettingVisible = false"></el-input>
+        </el-form-item>
+        <el-form-item label="延迟截图时间（单位：ms）">
+          <el-input type="number" v-model="compareSetting.delay" placeholder="延迟时间" @keyup.enter.native="compareSettingVisible = false"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <!-- <el-button @click="compareSettingVisible = false">取 消</el-button> -->
+        <el-button type="primary" @click="compareSettingVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -54,6 +73,7 @@ import JudgeVue from './Judge.vue'
 export default {
   data () {
     return {
+      // 答案问题数据
       answerList: [],
       form: {
         questionIds: null,
@@ -64,12 +84,19 @@ export default {
       questionList: [],
       scanType: 0,
       ansPicUrls: [],
-      // questionTexts: [],
+
+      // 图像比对数据
       autoCompare: false,
       compareAnswerNumber: 0, // 当前比较的参考运行截图序号
       canCompareNumber: 0, // 当前比较的运行截图序号
       isSending: false,
       canAskQuestionPic: false,
+      compareSetting: {
+        width: 1440,
+        height: 960,
+        delay: 500
+      },
+      compareSettingVisible: false,
 
       // 默认显示第几页
       currentPage: 1,
@@ -138,10 +165,10 @@ export default {
       const ansUrls = this.ansPicUrls
       return new Promise((resolve, reject) => {
         let pageUrl = 'http://yywebsite.cn/webcheck/#/template?questionId=' + questionId
-        let width = 1024
-        let height = 768
+        let width = this.compareSetting.width
+        let height = this.compareSetting.height
         let timeout = 40000
-        let delay = 500
+        let delay = this.compareSetting.delay
         this.axios(
           {
             method: 'POST',
@@ -261,6 +288,25 @@ export default {
         // this.askPictureUrl()
       }).catch((err) => {
         console.log('request /question/get: ', err)
+      })
+    },
+    handleCompareSetting () {
+      this.$prompt('运行截图配置', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        // inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
+        inputPattern: /\d*/,
+        inputErrorMessage: '单位像素，输入纯数字'
+      }).then(({ value }) => {
+        this.$message({
+          type: 'success',
+          message: '配置成功'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消输入'
+        })
       })
     },
     // refreashQuestionText () {

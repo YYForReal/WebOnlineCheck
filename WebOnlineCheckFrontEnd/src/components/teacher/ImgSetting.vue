@@ -15,8 +15,7 @@
                 </template>
             </el-table-column>
         </el-table>
-
-        <el-button type="primary" @click="handleAdd">增加</el-button>
+        <el-button class="fix-button" type="primary" icon="el-icon-edit" circle @click="handleAdd" ></el-button>
 
         <el-dialog :title="form.isDelete?'确认删除？':'实验题目设置'" :visible.sync="dialogFormVisible">
             <el-form :model="form">
@@ -269,5 +268,14 @@ export default {
 
 .demo-table-expand>>>.el-form-item__label {
     font-weight: bold;
+}
+
+.fix-button{
+  position: fixed;
+  width:70px;
+  height:70px;
+  font-size: 40px;
+  right:50px;
+  bottom:100px;
 }
 </style>

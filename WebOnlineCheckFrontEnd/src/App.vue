@@ -34,6 +34,6 @@ export default {
   margin-right: initial!important;
   margin-bottom: initial!important;
   padding: initial!important;
-  min-height: 800px;
+  /* min-height: 800px; */
 }
 </style>

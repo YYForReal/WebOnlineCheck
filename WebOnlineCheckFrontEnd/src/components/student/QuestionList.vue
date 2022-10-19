@@ -1,6 +1,11 @@
 <template>
   <el-row class="question-list">
     <h2>已提交列表</h2>
+    <h4>说明</h4>
+    <ol>
+      <li>提交前注意将img的引用地址从本地地址改为线上链接。</li>
+      <li>Tip：float属性设置后易导致高度塌陷问题。</li>
+    </ol>
     <el-collapse class="submit-list" v-model="activeNames" accordion>
       <el-collapse-item v-for="answer in scoreList" :key="answer.answerId" :title="answer.questionTitle"
         :name="answer.answerId">
@@ -37,18 +42,6 @@
         </div> -->
       </el-collapse-item>
     </el-collapse>
-    <h4>说明</h4>
-    <ol>
-      <!-- <li>平台仅作文本校验，提交后仍需给老师检查效果。</li> -->
-      <li>提交前注意将img的引用地址从本地地址改为线上链接。</li>
-      <li>为了尽可能还原最佳的网站显示效果：最好避免修改body标签样式，同时减少使用标签选择器修改div的样式。</li>
-
-      <!-- <li>查看时间：提交6日后可查看文本比对结果。</li> -->
-      <!-- <li>结果表示：<ins>绿色</ins>表示多余内容，<del>红色</del>表示缺少内容。有关换行产生的空格，中英文符号可忽略。</li> -->
-    </ol>
-    <!-- <h4>图片链接（右键-复制图片地址）</h4> -->
-    <!-- <img src="https://source.acexy.cn/view/YPFg5qJ" > -->
-
   </el-row>
 </template>
 <script>
@@ -59,7 +52,7 @@ export default {
   data () {
     return {
       activeNames: ['1'],
-      scoreList: []
+      scoreList: [],
 
     }
   },
@@ -161,4 +154,6 @@ ins {
   background: #00ff22c7;
   text-decoration: none;
 }
+
+
 </style>
