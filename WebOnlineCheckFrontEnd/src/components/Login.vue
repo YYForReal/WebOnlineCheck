@@ -160,6 +160,14 @@ export default {
         this.$router.push('/teacher/')
       })
     }
+  },
+  watch: {
+    remember (val) {
+      if (val === false) {
+        console.log('remove')
+        localStorage.removeItem('web-account')
+      }
+    }
   }
 }
 </script>
