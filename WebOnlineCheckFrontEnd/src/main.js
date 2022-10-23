@@ -13,8 +13,8 @@ import md5 from 'js-md5'
 
 Vue.prototype.$md5 = md5
 Vue.prototype.axios = axios
-Vue.prototype.baseUrl = 'http://localhost:5520'
-// Vue.prototype.baseUrl = 'http://118.31.165.150:5520'
+// Vue.prototype.baseUrl = 'http://localhost:5520'
+Vue.prototype.baseUrl = 'http://118.31.165.150:5520'
 Vue.config.productionTip = false
 // Vue.use(ElementUI)
 // Vue.use(ELEMENT) // 注意大写

@@ -28,9 +28,21 @@
 
 export default {
   name: 'Main',
-  methods: {
+  computed: {
+    account () {
+      return this.$store.state.account
+    }
   },
-  components: {
+  mounted () {
+    if (this.account === null || this.account === undefined) {
+      let storage = sessionStorage.getItem('web-account')
+      let obj = JSON.parse(window.decodeURIComponent(window.atob(storage)))
+      if (storage == null || obj.username == null || obj.userid == null) {
+        this.$router.push('/login')
+      } else {
+        this.$store.dispatch('handleLogin', obj)
+      }
+    }
   }
 }
 </script>

@@ -52,8 +52,7 @@ export default {
   data () {
     return {
       activeNames: ['1'],
-      scoreList: [],
-
+      scoreList: []
     }
   },
   components: {
@@ -65,19 +64,21 @@ export default {
     }
   },
   mounted () {
-    if (this.account === null || this.account === undefined) {
-      let storage = sessionStorage.getItem('web-account')
-      let obj = JSON.parse(storage)
-      if (storage == null || obj.username == null || obj.userid == null) {
-        this.$router.push('/login')
-      } else {
-        this.$store.dispatch('handleLogin', obj).then(() => {
-          this.refreshSubmitList()
-        })
-      }
-    } else {
-      this.refreshSubmitList()
-    }
+    this.refreshSubmitList()
+
+    // if (this.account === null || this.account === undefined) {
+    //   let storage = sessionStorage.getItem('web-account')
+    //   let obj = JSON.parse(window.decodeURIComponent(window.atob(storage)))
+    //   if (storage == null || obj.username == null || obj.userid == null) {
+    //     this.$router.push('/login')
+    //   } else {
+    //     this.$store.dispatch('handleLogin', obj).then(() => {
+    //       this.refreshSubmitList()
+    //     })
+    //   }
+    // } else {
+    //   this.refreshSubmitList()
+    // }
   },
   methods: {
     viewEffect (answerId) {
@@ -154,6 +155,5 @@ ins {
   background: #00ff22c7;
   text-decoration: none;
 }
-
 
 </style>

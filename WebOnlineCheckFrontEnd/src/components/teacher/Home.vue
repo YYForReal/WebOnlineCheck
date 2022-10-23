@@ -49,6 +49,24 @@ export default {
       next('/login')
     }
     next()
+  },
+  computed: {
+    account () {
+      return this.$store.state.account
+    }
+  },
+  mounted () {
+    // 如果用户刷新了页面
+    if (this.account === null || this.account === undefined) {
+      let storage = sessionStorage.getItem('web-account')
+      let obj = JSON.parse(window.decodeURIComponent(window.atob(storage)))
+      if (storage == null || obj.username == null || obj.userid == null) {
+        this.$router.push('/login')
+      } else {
+        console.log('dispatch', obj)
+        this.$store.dispatch('handleTeacherLogin', obj)
+      }
+    }
   }
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <el-form ref="AccountFrom" :model="account" :rules="rules" label-width="0px" class="login-container">
+  <el-form ref="AccountForm" :model="account" :rules="rules" label-width="0px" class="login-container">
     <h2>系统登录</h2>
     <el-form-item prop="username">
       <el-input type="text" v-model="account.username" auto-complete="off" placeholder="姓名"></el-input>
@@ -8,11 +8,9 @@
       <el-input type="password" v-model="account.userid" auto-complete="off" placeholder="学号"
         @keyup.enter.native="handleLogin"></el-input>
     </el-form-item>
+    <el-checkbox v-model="remember">记住我</el-checkbox>
     <el-form-item class="btn-box">
-      <el-button type="primary" @click="handleLogin" :loading="logining">登录</el-button>
-      <!-- <el-button type="primary">
-        <router-link to="/" style="text-decoration:none; color:white">返回首页</router-link>
-      </el-button> -->
+      <el-button type="primary" @click="handleLogin" >登录</el-button>
     </el-form-item>
     <div class="fix-reading-box">
       <video src="http://www.yywebsite.cn/video/reading.mp4" autoplay loop muted width="200px"></video>
@@ -26,7 +24,6 @@ export default {
   data () {
     // 表单校验,默认的用户名，密码
     return {
-      logining: false,
       account: {
         username: '',
         userid: ''
@@ -41,12 +38,20 @@ export default {
           required: true, message: '请输入学号', trigger: 'blur'
         }]
       },
-      checked: true
+      checked: true,
+      remember: false
+    }
+  },
+  mounted () {
+    let webAccount = localStorage.getItem('web-account')
+    if (webAccount != null) {
+      this.account = JSON.parse(window.decodeURIComponent(window.atob(webAccount)))
+      this.remember = true
     }
   },
   methods: {
     handleLogin () {
-      this.$refs.AccountFrom.validate((valid) => {
+      this.$refs.AccountForm.validate((valid) => {
         if (valid) {
           this.checkUser()
             .then((response) => {
@@ -59,13 +64,23 @@ export default {
                   } else if (res.data.type === 1) {
                     // 老师登录
                     sessionStorage.setItem('web-token', this.$md5('1'))
-                    sessionStorage.setItem('web-account', JSON.stringify(this.account))
+                    sessionStorage.setItem('web-account', window.btoa(window.encodeURIComponent(JSON.stringify(this.account))))
+                    if (this.remember) {
+                      localStorage.setItem('web-account', window.btoa(window.encodeURIComponent(JSON.stringify(this.account))))
+                    } else {
+                      localStorage.removeItem('web-account')
+                    }
                     this.recordLogin()
                     this.teacherLogin()
                   } else if (res.data.type === 0) {
                     // 学生登录
                     sessionStorage.setItem('web-token', this.$md5('0'))
-                    sessionStorage.setItem('web-account', JSON.stringify(this.account))
+                    sessionStorage.setItem('web-account', window.btoa(window.encodeURIComponent(JSON.stringify(this.account))))
+                    if (this.remember) {
+                      localStorage.setItem('web-account', window.btoa(window.encodeURIComponent(JSON.stringify(this.account))))
+                    } else {
+                      localStorage.removeItem('web-account')
+                    }
                     this.studentLogin()
                   }
                 }).catch((e) => {
@@ -177,5 +192,10 @@ h3 {
   position: fixed;
   right: 0;
   bottom: 0;
+}
+
+.form-footer {
+  display: flex;
+  justify-content: center;
 }
 </style>
