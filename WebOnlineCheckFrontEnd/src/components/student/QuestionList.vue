@@ -64,6 +64,7 @@ export default {
     }
   },
   mounted () {
+    console.log('QuestionLisr mounted')
     this.refreshSubmitList()
 
     // if (this.account === null || this.account === undefined) {
@@ -82,7 +83,7 @@ export default {
   },
   methods: {
     viewEffect (answerId) {
-      window.open('http://yywebsite.cn/webcheck/#/template?answerId=' + answerId + '&userId=' + this.$md5(this.account.userid), '_blank') // 注意第二个参数
+      window.open('http://yywebsite.cn/webcheck/#/template?answerId=' + answerId + '&userId=' + window.decodeURIComponent(window.atob(this.account.userid)), '_blank') // 注意第二个参数
       // window.open('http://localhost:8081/#/template?answerId=' + answerId + '&userId=' + this.$md5(this.account.userid), '_blank') // 注意第二个参数
     },
     formatTime (str) {

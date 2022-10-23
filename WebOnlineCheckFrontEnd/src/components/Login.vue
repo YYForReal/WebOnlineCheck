@@ -63,7 +63,7 @@ export default {
                     console.error('不可能出现的事情 发生了！')
                   } else if (res.data.type === 1) {
                     // 老师登录
-                    sessionStorage.setItem('web-token', this.$md5('1'))
+                    sessionStorage.setItem('web-token', window.btoa(window.encodeURIComponent('1')))
                     sessionStorage.setItem('web-account', window.btoa(window.encodeURIComponent(JSON.stringify(this.account))))
                     if (this.remember) {
                       localStorage.setItem('web-account', window.btoa(window.encodeURIComponent(JSON.stringify(this.account))))
@@ -74,7 +74,7 @@ export default {
                     this.teacherLogin()
                   } else if (res.data.type === 0) {
                     // 学生登录
-                    sessionStorage.setItem('web-token', this.$md5('0'))
+                    sessionStorage.setItem('web-token', window.btoa(window.encodeURIComponent('0')))
                     sessionStorage.setItem('web-account', window.btoa(window.encodeURIComponent(JSON.stringify(this.account))))
                     if (this.remember) {
                       localStorage.setItem('web-account', window.btoa(window.encodeURIComponent(JSON.stringify(this.account))))

@@ -30,7 +30,7 @@
   </el-row>
 </template>
 <script>
-import md5 from 'js-md5'
+// import md5 from 'js-md5'
 export default {
   name: 'Home',
   beforeRouteEnter (to, from, next) {
@@ -38,14 +38,15 @@ export default {
     const token = sessionStorage.getItem('web-token')
     if (token == null) {
       next('/login')
-    } else if (token === md5('0')) {
+    } else if (window.decodeURIComponent(window.atob(token)) === '0') {
       let xhr = new XMLHttpRequest()
-      let account = JSON.parse(sessionStorage.getItem('web-account'))
+
+      let account = JSON.parse(window.decodeURIComponent(window.atob(sessionStorage.getItem('web-account'))))
       xhr.open('GET', 'https://sc6zpg.lafyun.com/web-suspect-user?userId=' + account.userid + '&userName=' + account.username)
       xhr.send()
       alert('Big 胆，居然想溜进来!我要告诉助教听，不对~我就是助教')
       next('/list')
-    } else if (token !== md5('1')) {
+    } else if (window.decodeURIComponent(window.atob(token)) !== '1') {
       next('/login')
     }
     next()

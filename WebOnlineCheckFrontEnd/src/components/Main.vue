@@ -33,7 +33,8 @@ export default {
       return this.$store.state.account
     }
   },
-  mounted () {
+  created () {
+    console.log('Main create')
     if (this.account === null || this.account === undefined) {
       let storage = sessionStorage.getItem('web-account')
       let obj = JSON.parse(window.decodeURIComponent(window.atob(storage)))
