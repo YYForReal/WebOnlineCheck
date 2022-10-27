@@ -1,45 +1,55 @@
 <template>
-  <table class="comp-card">
-    <tr class="table-header">
+  <div>
+    <!--
       <td>原内容</td>
-      <td>过滤的HTML</td>
-      <td>比对结果</td>
-    </tr>
-    <tr class="table-content">
       <td v-text="content"></td>
+      <td>过滤的HTML</td>
       <td ref="b" v-text="answerText"></td>
-      <td>
-        <div ref="result" v-html="resultHtml"></div>
-      </td>
-    </tr>
-    <tr class="table-one-header " v-if="visitType == 1">
-      <td>参考运行截图 </td>
-      <td colspan="2">运行截图</td>
+
+     -->
+    <table class="comp-card">
+      <tr class="table-header">
+        <td class="td-text"><a @click="dialogVisiable = true" style="text-decoration:underline;cursor:pointer">比对结果</a></td>
+        <td class="td-pic">参考运行截图 </td>
+        <td class="td-pic">运行截图</td>
+      </tr>
+      <tr class="table-content">
+        <td class="td-text">
+          <div ref="result" v-html="resultHtml"></div>
+        </td>
+        <td v-loading="!comparePic">
+          <el-popover placement="top-start" trigger="click">
+            <img :src="comparePic" class="comp-image">
+            <img slot="reference" :src="comparePic" class="comp-image">
+          </el-popover>
+        </td>
+        <td v-loading="isLoading">
+          <!-- 不使用iframe进行观察，替换为运行截图 -->
+          <!-- <iframe ref="iframe"></iframe> -->
+          <el-popover placement="top-start" trigger="click">
+            <!--trigger属性值：hover、click、focus 和 manual-->
+            <img :src="runningPic" class="comp-image">
+            <img slot="reference" :src="runningPic" class="comp-image">
+          </el-popover>
+        </td>
+      </tr>
+      <!-- <tr class="table-one-header " v-if="visitType == 1">
     </tr>
     <tr v-if="visitType == 1">
-      <td v-loading="!comparePic">
-        <!-- <img :src="comparePic" class="comp-image"> -->
-        <!--
-        <a :href="comparePic" target="_blank" title="查看最大化图片">
-            <img :src="comparePic" class="comp-image">
-          </a>
-          <img slot="reference" :src="comparePic" style="width: 50px;height: 50px; cursor:pointer"> -->
-        <el-popover placement="top-start" trigger="click">
-          <img :src="comparePic" class="comp-image">
-          <img slot="reference" :src="comparePic" class="comp-image">
-        </el-popover>
-      </td>
-      <td colspan="2" v-loading="isLoading">
-        <!-- 不使用iframe进行观察，替换为运行截图 -->
-        <!-- <iframe ref="iframe"></iframe> -->
-        <el-popover placement="top-start" trigger="click">
-          <!--trigger属性值：hover、click、focus 和 manual-->
-          <img :src="runningPic" class="comp-image">
-          <img slot="reference" :src="runningPic" class="comp-image">
-        </el-popover>
-      </td>
-    </tr>
-  </table>
+
+    </tr> -->
+    </table>
+    <el-dialog title="详细信息" :visible.sync="dialogVisiable" width="50%">
+      <h3>原内容</h3>
+      <p>{{ content }}</p>
+      <h3>过滤的HTML</h3>
+      <p>{{ answerText }}</p>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogVisiable = false">确 定</el-button>
+      </span>
+    </el-dialog>
+  </div>
+
 </template>
 <script>
 export default {
@@ -61,7 +71,8 @@ export default {
       ],
       answerText: '此处显示比对的html文本内容',
       compText: '',
-      resultHtml: '此处显示比对结果'
+      resultHtml: '此处显示比对结果',
+      dialogVisiable: false
     }
   },
   mounted () {
@@ -166,7 +177,7 @@ export default {
     }
   },
   watch: {
-    content: function () {},
+    content: function () { },
     score: function (val) {
       this.newScore = val
     },
@@ -194,9 +205,9 @@ export default {
 }
 
 .comp-card>>>tr td {
-  width: 400px;
   border: 1px solid #000000e6;
   overflow-wrap: anywhere;
+  min-height: 200px;
 }
 
 .comp-card>>>del {
@@ -226,6 +237,15 @@ export default {
   background-color: rgb(24, 226, 230);
 }
 
+.comp-card .table-header .td-text {
+  width: 250px;
+  max-width: 350px;
+}
+
+.comp-card .table-header .td-pic {
+  min-width: 350px;
+}
+
 .comp-card>>>.table-one-header {
   height: 38px;
   width: 100%;
@@ -237,5 +257,15 @@ export default {
 .comp-card .comp-image {
   width: 100%;
   min-height: 100px;
+}
+
+.table-content .td-text {
+  width: 21%;
+  max-width: 350px;
+}
+
+.table-content td {
+  width: 38%;
+  height: 300px;
 }
 </style>

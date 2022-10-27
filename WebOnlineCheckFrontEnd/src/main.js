@@ -9,9 +9,9 @@ import Vuex from 'vuex'// 导入仓库配置
 // import 'element-ui/lib/theme-chalk/index.css'
 import store from './store/store'
 import axios from 'axios'
-import md5 from 'js-md5'
+// import md5 from 'js-md5'
 
-Vue.prototype.$md5 = md5
+// Vue.prototype.$md5 = md5
 Vue.prototype.axios = axios
 // Vue.prototype.baseUrl = 'http://localhost:5520'
 Vue.prototype.baseUrl = 'http://118.31.165.150:5520'

@@ -1,5 +1,9 @@
 <template>
   <el-card class="judge-card">
+    <div class="star" ref="star" :class="{ 'active-star': active }" @mouseenter="active = true"
+      @mouseleave="active = false">
+      <p>{{ showQId }}</p>
+    </div>
     <div class="student-info-box">
       <el-form :inline="true" :model="formInline">
         <el-form-item label="学号">
@@ -11,7 +15,6 @@
           <!-- <span class="form-span" >{{username}}</span> -->
           <el-input class="form-span" v-model="username" disabled="disabled"></el-input>
         </el-form-item>
-
         <!-- <el-form-item label="原分数">
           <el-input v-model="score" disabled="disabled"></el-input>
         </el-form-item>
@@ -21,12 +24,14 @@
           <!-- similarity -->
           <el-input class="form-span" v-loading="isLoading" v-model="similarity" disabled="disabled"></el-input>
         </el-form-item>
+
         <el-form-item>
           <el-button type="primary" @click="picCompare">比对刷新</el-button>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="viewEffect">查看效果</el-button>
         </el-form-item>
+        <p class="form-span">{{ formatTime(updateTime) }}</p>
 
         <!-- <el-form-item label="分数">
           <el-input v-model="formInline.newScore" type="number"></el-input>
@@ -42,11 +47,13 @@
 </template>
 
 <script>
+import { MyFilter } from '@/utils/myFilter.js'
 import CompareCard from '../CompareCard.vue'
 export default {
   name: 'Judge',
   data () {
     return {
+      active: false,
       formInline: {
         newScore: 100
       },
@@ -65,12 +72,15 @@ export default {
     }
   },
   methods: {
+    formatTime (time) {
+      return MyFilter.dateFormat(time)
+    },
     viewEffect () {
       window.open('http://yywebsite.cn/webcheck/#/template?answerId=' + this.answerId, '_blank') // 注意第二个参数
     },
     askForSimilarity (pic1, pic2) {
       this.axios({
-        url: this.baseUrl + '/answer/compare',
+        url: this.baseUrl + '/answer/newcompare',
         method: 'post',
         transformRequest: [(data) => {
           var oMyForm = new FormData()
@@ -83,7 +93,7 @@ export default {
         //   type: 'success',
         //   message: res.data.message
         // })
-        this.similarity = res.data.data
+        this.similarity = res.data.data * 100
       }).catch((err) => {
         console.log('request /answer/compare: ', err)
       })
@@ -225,6 +235,10 @@ export default {
       type: String,
       default: ''
     },
+    questionTitle: {
+      type: String,
+      default: '123123'
+    },
     userId: {
       type: String,
       default: ''
@@ -245,11 +259,15 @@ export default {
       type: Boolean,
       default: false
     },
+    updateTime: {
+      type: String,
+      default: ''
+    },
     compareSetting: {
       type: Object,
       default () {
         return {
-          width: 1440,
+          width: 1024,
           height: 960,
           delay: 500
         }
@@ -263,9 +281,27 @@ export default {
       this.newScore = val
     },
     autoCompare: function (val) {
+      console.log('change SOn')
       if (val === true) {
         console.log('auto')
         this.picCompare()
+      }
+    },
+    active: function (val) {
+      console.log('change', this.$refs.star.style)
+      let str = this.questionTitle
+      if (val === true) {
+        // 匹配中文个数
+        let reg = /[\u4e00-\u9fa5\uf900-\ufa2d]/g // 匹配中文的字符   g表示全局匹配
+        let reg1 = /[\u3002|\uff1f|\uff01|\uff0c|\u3001|\uff1b|\uff1a|\u201c|\u201d|\u2018|\u2019|\uff08|\uff09|\u300a|\u300b|\u3008|\u3009|\u3010|\u3011|\u300e|\u300f|\u300c|\u300d|\ufe43|\ufe44|\u3014|\u3015|\u2026|\u2014|\uff5e|\ufe4f|\uffe5]/g
+        let res = str.match(reg)
+        let res2 = str.match(reg1)
+        let width1 = res.length + res2.length
+        // 计算其余宽度
+        let width2 = Math.max(str.length - width1, 0)
+        this.$refs.star.style.width = (width1 * 16 + width2 * 11) + 'px'
+      } else {
+        this.$refs.star.style.width = '40px'
       }
     }
   },
@@ -275,6 +311,12 @@ export default {
     },
     isTeacher () {
       return this.$store.state.isTeacher
+    },
+    showQId () {
+      if (this.active) {
+        return this.questionTitle
+      }
+      return this.questionId
     }
   }
 }
@@ -284,6 +326,7 @@ export default {
 .judge-card {
   /* justify-content: center; */
   /* align-items: center; */
+  position: relative;
   width: 95%;
   border-radius: 5px;
   /* background-color: rgba(240, 250, 255, 0.593); */
@@ -292,6 +335,41 @@ export default {
   margin-bottom: 30px;
   padding-bottom: 5px;
   /* border: 1px dotted dodgerblue; */
+}
+
+.judge-card .star {
+  position: absolute;
+  width: 40px;
+  height: 38px;
+  line-height: 38px;
+  background-color: darkturquoise;
+  color: aliceblue;
+  left: -12px;
+  top: 0px;
+  z-index: 99;
+  border-radius: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+  padding-left: 20px;
+  transition: all 1s;
+
+}
+
+.judge-card .active-star {
+  position: absolute;
+  height: 38px;
+  background-color: #409EFF;
+  left: 0px;
+  top: 0px;
+  border-radius: 5px;
+  padding-right: 20px;
+}
+
+.judge-card .star p {
+  margin-top: 0;
+  margin-bottom: 0;
+  transition: all 1s;
 }
 
 .judge-card>>>.student-info-box {
@@ -304,5 +382,7 @@ export default {
   display: inline-block;
   min-width: 100px;
   max-width: 150px;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 </style>

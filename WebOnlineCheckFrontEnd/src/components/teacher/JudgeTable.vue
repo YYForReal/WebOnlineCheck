@@ -1,4 +1,4 @@
-<template>
+div<template>
   <div class="judge-table">
     <div class="box">
       <h2>筛选栏</h2>
@@ -20,9 +20,7 @@
           </el-input>
         </el-form-item>
         <el-button type="info" round @click="compareSettingVisible = true">截图配置</el-button>
-
         <el-button type="primary" icon="el-icon-search" round @click="refreshAnswerList">搜索</el-button>
-
       </el-form>
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage"
         :page-sizes="pageSizes" :page-size="PageSize" layout="total, sizes, prev, pager, next, jumper"
@@ -35,29 +33,33 @@
     </div> -->
     <div class="student-submit-box">
       <h3>学生提交</h3>
-      <div class="one-box" v-for="(item,i) in showAnswerList.slice((currentPage-1)*PageSize,currentPage*PageSize)"
+      <div class="one-box" v-for="(item, i) in showAnswerList.slice((currentPage - 1) * PageSize, currentPage * PageSize)"
         :key="item.answerId">
         <JudgeVue :answerId="item.answerId" :content="item.content" :score="item.score"
           :questionText="chooseQuestionText(item.questionId)" :userId="item.userId" :username="item.username"
-          @changeScore="changeScore" :questionId="item.questionId" :basePicUrl2="chooseAnsPicUrl(item.questionId)"
-          :autoCompare="(autoCompare && canCompareNumber>=i)" @completeCompare="completeCompare"
-          :compareSetting="compareSetting" />
+          :updateTime="item.updateTime" :questionId="item.questionId" :basePicUrl2="chooseAnsPicUrl(item.questionId)"
+          :questionTitle="chooseQuestionTitle(item.questionId)"
+          :compareSetting="compareSetting" :autoCompare="(autoCompare && canCompareNumber >= i)"
+          @changeScore="changeScore" @completeCompare="completeCompare" />
       </div>
     </div>
     <!-- :before-close="handleClose" -->
-    <el-dialog title="截图配置" :visible.sync="compareSettingVisible" width="50%" >
+    <el-dialog title="截图配置" :visible.sync="compareSettingVisible" width="50%">
       <el-form>
         <el-form-item label="一键比对">
           <el-switch v-model="autoCompare" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
         </el-form-item>
         <el-form-item label="模拟浏览器宽度（单位：px）">
-          <el-input type="number" v-model="compareSetting.width" placeholder="图像宽度" @keyup.enter.native="compareSettingVisible = false" ></el-input>
+          <el-input type="number" v-model="compareSetting.width" placeholder="图像宽度"
+            @keyup.enter.native="compareSettingVisible = false"></el-input>
         </el-form-item>
         <el-form-item label="模拟浏览器高度（单位：px）">
-          <el-input type="number" v-model="compareSetting.height" placeholder="图像高度" @keyup.enter.native="compareSettingVisible = false"></el-input>
+          <el-input type="number" v-model="compareSetting.height" placeholder="图像高度"
+            @keyup.enter.native="compareSettingVisible = false"></el-input>
         </el-form-item>
         <el-form-item label="延迟截图时间（单位：ms）">
-          <el-input type="number" v-model="compareSetting.delay" placeholder="延迟时间" @keyup.enter.native="compareSettingVisible = false"></el-input>
+          <el-input type="number" v-model="compareSetting.delay" placeholder="延迟时间"
+            @keyup.enter.native="compareSettingVisible = false"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -92,7 +94,7 @@ export default {
       isSending: false,
       canAskQuestionPic: false,
       compareSetting: {
-        width: 1440,
+        width: 1024,
         height: 960,
         delay: 500
       },
@@ -135,6 +137,7 @@ export default {
       this.currentPage = val
       this.canCompareNumber = 0
     },
+    // 通过ID选择对应的参考图片
     chooseAnsPicUrl (questionId) {
       // console.log('choise ans:', this.ansPicUrls)
       for (let i = 0; i < this.ansPicUrls.length; i++) {
@@ -145,10 +148,20 @@ export default {
       }
       return null
     },
+    // 通过id选择对应的比对文本
     chooseQuestionText (questionId) {
       for (let i = 0; i < this.questionList.length; i++) {
         if (this.questionList[i].questionId === questionId) {
           return this.questionList[i].content
+        }
+      }
+      return null
+    },
+    chooseQuestionTitle (questionId) {
+      for (let i = 0; i < this.questionList.length; i++) {
+        if (this.questionList[i].questionId === questionId) {
+          console.log('CHoose tile：', this.questionList[i].title)
+          return this.questionList[i].title
         }
       }
       return null
@@ -186,6 +199,15 @@ export default {
             })
             if (this.compareAnswerNumber < this.questionPicList.length) {
               this.askOnePic(this.questionPicList[this.compareAnswerNumber].questionId)
+            } else {
+              // 查询结束
+              if (this.autoCompare === true) {
+                console.log('autoComapre == true')
+                this.autoCompare = false
+                setTimeout(() => {
+                  this.autoCompare = true // 为了触发vue的双向绑定 监听
+                }, 100)
+              }
             }
           } else if (res.data.code === 99999) {
             this.$message({
@@ -290,25 +312,25 @@ export default {
         console.log('request /question/get: ', err)
       })
     },
-    handleCompareSetting () {
-      this.$prompt('运行截图配置', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        // inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
-        inputPattern: /\d*/,
-        inputErrorMessage: '单位像素，输入纯数字'
-      }).then(({ value }) => {
-        this.$message({
-          type: 'success',
-          message: '配置成功'
-        })
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '取消输入'
-        })
-      })
-    },
+    // handleCompareSetting () {
+    //   this.$prompt('运行截图配置', '提示', {
+    //     confirmButtonText: '确定',
+    //     cancelButtonText: '取消',
+    //     // inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
+    //     inputPattern: /\d*/,
+    //     inputErrorMessage: '单位像素，输入纯数字'
+    //   }).then(({ value }) => {
+    //     this.$message({
+    //       type: 'success',
+    //       message: '配置成功'
+    //     })
+    //   }).catch(() => {
+    //     this.$message({
+    //       type: 'info',
+    //       message: '取消输入'
+    //     })
+    //   })
+    // },
     // refreashQuestionText () {
     //   this.questionTexts = []
     //   this.questionList.forEach(element => {
@@ -351,6 +373,17 @@ export default {
       handler () { },
       deep: true
     },
+    'compareSetting.width': {
+      handler () {
+        if (this.form.timer != null) {
+          clearTimeout(this.form.timer)
+        }
+        this.form.timer = setTimeout(() => {
+          this.askPictureUrl()
+          this.form.timer = null
+        }, 1500)
+      }
+    },
     autoCompare: {
       handler () {
         this.canCompareNumber = 0
@@ -367,7 +400,7 @@ export default {
   },
   computed: {
     showAnswerList () {
-      return this.answerList.filter((value) => {
+      let resList = this.answerList.filter((value) => {
         let idFlag = true
         let nameFlag = true
         if (this.form.userId != null && this.form.userId !== '') {
@@ -378,6 +411,16 @@ export default {
         }
         return idFlag && nameFlag
       })
+      resList.sort((a, b) => {
+        if (a.questionId !== b.questionId) {
+          return a.questionId - b.questionId
+        } else if (a.userId !== b.userId) {
+          return a.userId - b.userId
+        } else {
+          return 1
+        }
+      })
+      return resList
     },
     questionPicList () {
       if (this.form.questionIds == null || this.form.questionIds.length === 0) {

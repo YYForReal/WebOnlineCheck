@@ -18,7 +18,6 @@ export default {
          /_/    \\_\\\\__,_| \\__||_| |_| \\___/ |_|  (_)|_|  |_|   |_|      |_|`
 
     console.log(author)
-    console.log('大哥~手下留情啊~别黑我📌')
   }
 }
 </script>
@@ -34,6 +33,7 @@ export default {
   margin-right: initial!important;
   margin-bottom: initial!important;
   padding: initial!important;
+  background-color: inherit!important;
   /* min-height: 800px; */
 }
 </style>

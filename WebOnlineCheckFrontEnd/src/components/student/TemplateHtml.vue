@@ -1,5 +1,5 @@
 <template>
-  <div id="template-box" v-html="htmlText">
+  <div id="template-box" ref="tempalteBox" v-html="htmlText">
     <!-- <iframe src="" frameborder="0"></iframe> -->
   </div>
 </template>
@@ -11,8 +11,7 @@ export default {
       htmlText: ''
     }
   },
-  mounted () {
-    // request htmlText
+  created () {
     let answerId = this.$route.query.answerId
     if (answerId != null) {
       // console.log('answerId:', answerId)
@@ -44,20 +43,49 @@ export default {
         console.log('search answer: ', err)
       })
     }
+  },
+  watch: {
+    htmlText: {
+      handler (str) {
+        let reg = /<script[^>]*>([^<]|<(?!\/script))*<\/script>/gmi
+        let res = str.match(reg)
+        let bodyDom = this.$refs.tempalteBox
+
+        console.log('匹配的结果:', res)
+        res.forEach((ele) => {
+          let startIndex = ele.indexOf('>')
+          let endIndex = ele.lastIndexOf('<')
+          ele = ele.slice(startIndex + 1, endIndex)
+          let scriptDom = document.createElement('script')
+          scriptDom.type = 'text/javascript'
+          scriptDom.text = ele
+          try {
+            bodyDom.appendChild(scriptDom)
+          } catch (e) {
+            console.log('JS代码有误:', e)
+          }
+        })
+
+        // let scriptNode = document.createElement('script')
+        // scriptNode.text = res
+        // document.body.appendChild(scriptNode)
+      }
+    }
   }
 }
 </script>
 <style>
 #template-box {
-  margin: initial!important;
-  padding: initial!important;
-  height:100%;
-  border-width: 0px!important;
+  margin: initial !important;
+  padding: initial !important;
+  height: 100%;
+  border-width: 0px !important;
   border-top: 0;
-  margin-top: initial!important;
-  margin-left: initial!important;
-  margin-right: initial!important;
-  margin-bottom: initial!important;
-}
+  margin-top: initial !important;
+  margin-left: initial !important;
+  margin-right: initial !important;
+  margin-bottom: initial !important;
+  background-color: inherit!important;
 
+}
 </style>
