@@ -47,22 +47,26 @@ export default {
   watch: {
     htmlText: {
       handler (str) {
+        if (str == null || str === '') return
+        // 获取script标签内的内容
         let reg = /<script[^>]*>([^<]|<(?!\/script))*<\/script>/gmi
         let res = str.match(reg)
         let bodyDom = this.$refs.tempalteBox
 
-        console.log('匹配的结果:', res)
+        // console.log('匹配的结果:', res)
         res.forEach((ele) => {
           let startIndex = ele.indexOf('>')
           let endIndex = ele.lastIndexOf('<')
           ele = ele.slice(startIndex + 1, endIndex)
+          // console.log(ele)
+
           let scriptDom = document.createElement('script')
           scriptDom.type = 'text/javascript'
           scriptDom.text = ele
           try {
             bodyDom.appendChild(scriptDom)
           } catch (e) {
-            console.log('JS代码有误:', e)
+            console.log('JS代码报错:', e)
           }
         })
 
@@ -85,7 +89,7 @@ export default {
   margin-left: initial !important;
   margin-right: initial !important;
   margin-bottom: initial !important;
-  background-color: inherit!important;
+  background-color: inherit !important;
 
 }
 </style>

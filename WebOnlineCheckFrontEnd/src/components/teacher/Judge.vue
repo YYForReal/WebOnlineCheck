@@ -22,7 +22,7 @@
         <el-form-item label="相似度:">
           <!-- <span class="form-span"  v-loading="!similarity">{{similarity}}</span> -->
           <!-- similarity -->
-          <el-input class="form-span" v-loading="isLoading" v-model="similarity" disabled="disabled"></el-input>
+          <el-input class="form-span" v-loading="isLoading2" v-model="similarity" disabled="disabled"></el-input>
         </el-form-item>
 
         <el-form-item>
@@ -41,8 +41,14 @@
         </el-form-item> -->
       </el-form>
     </div>
-    <CompareCard :visitType="1" :content="content" :questionText="questionText" :comparePic="basePicUrl2"
-      :runningPic="basePicUrl" :isLoading="isLoading" />
+    <CompareCard :visitType="compareSetting.visitType==false?1:0"
+    :content="content"
+    :questionText="question.content"
+    :comparePic="basePicUrl2"
+    :runningPic="basePicUrl"
+    :isLoading="isLoading"
+    :question="question"
+    />
   </el-card>
 </template>
 
@@ -59,7 +65,8 @@ export default {
       },
       basePicUrl: 'https://source.acexy.cn/view/YPIBluo',
       similarity: null,
-      isLoading: false
+      isLoading: false,
+      isLoading2: false
     }
   },
   components: {
@@ -94,12 +101,14 @@ export default {
         //   message: res.data.message
         // })
         this.similarity = res.data.data * 100
+        this.isLoading2 = false
       }).catch((err) => {
         console.log('request /answer/compare: ', err)
       })
     },
     picCompare () {
       this.isLoading = true
+      this.isLoading2 = true
       // let pageUrl = 'http://yywebsite.cn/'
       let pageUrl = 'http://yywebsite.cn/webcheck/#/template' + '?answerId=' + this.answerId
       let width = this.compareSetting.width
@@ -120,7 +129,7 @@ export default {
         if (res.data.code === 0) {
           // 获取该答案的base转码
           this.basePicUrl = res.data.data.image
-          console.log('图像的base转码为:', this.basePicUrl)
+          // console.log('图像的base转码为:', this.basePicUrl)
           // 获取问题的base转码
           // this.basePicUrl2 = this.$emit('getQuestionBase')
           // console.log('答案的base转码为:', this.basePicUrl2)
@@ -130,6 +139,7 @@ export default {
         }
       }).catch(() => {
         this.isLoading = false
+        this.isLoading2 = false
         this.$message({
           type: 'error',
           message: '网络异常',
@@ -231,14 +241,17 @@ export default {
       type: Number,
       default: 0
     },
-    questionText: {
-      type: String,
-      default: ''
+    question: {
+      tyep: Object
     },
-    questionTitle: {
-      type: String,
-      default: '123123'
-    },
+    // questionText: {
+    //   type: String,
+    //   default: ''
+    // },
+    // questionTitle: {
+    //   type: String,
+    //   default: '123123'
+    // },
     userId: {
       type: String,
       default: ''
@@ -289,7 +302,8 @@ export default {
     },
     active: function (val) {
       console.log('change', this.$refs.star.style)
-      let str = this.questionTitle
+      // let str = this.questionTitle
+      let str = this.question.title
       if (val === true) {
         // 匹配中文个数
         let reg = /[\u4e00-\u9fa5\uf900-\ufa2d]/g // 匹配中文的字符   g表示全局匹配
@@ -314,7 +328,7 @@ export default {
     },
     showQId () {
       if (this.active) {
-        return this.questionTitle
+        return this.question.title
       }
       return this.questionId
     }

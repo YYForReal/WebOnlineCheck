@@ -35,10 +35,15 @@ div<template>
       <h3>学生提交</h3>
       <div class="one-box" v-for="(item, i) in showAnswerList.slice((currentPage - 1) * PageSize, currentPage * PageSize)"
         :key="item.answerId">
-        <JudgeVue :answerId="item.answerId" :content="item.content" :score="item.score"
-          :questionText="chooseQuestionText(item.questionId)" :userId="item.userId" :username="item.username"
-          :updateTime="item.updateTime" :questionId="item.questionId" :basePicUrl2="chooseAnsPicUrl(item.questionId)"
+
+        <!-- :questionText="chooseQuestionText(item.questionId)"
           :questionTitle="chooseQuestionTitle(item.questionId)"
+
+           -->
+        <JudgeVue :answerId="item.answerId" :content="item.content" :score="item.score"
+          :userId="item.userId" :username="item.username"
+          :updateTime="item.updateTime" :questionId="item.questionId" :basePicUrl2="chooseAnsPicUrl(item.questionId)"
+          :question="chooseQuestion(item.questionId)"
           :compareSetting="compareSetting" :autoCompare="(autoCompare && canCompareNumber >= i)"
           @changeScore="changeScore" @completeCompare="completeCompare" />
       </div>
@@ -61,6 +66,11 @@ div<template>
           <el-input type="number" v-model="compareSetting.delay" placeholder="延迟时间"
             @keyup.enter.native="compareSettingVisible = false"></el-input>
         </el-form-item>
+        <el-form-item label="是否使用Iframe查看（针对CSS动画）">
+          <el-switch v-model="compareSetting.visitType" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+        </el-form-item>
+
+        <p>若问题参考截图失败，需重新勾选问题。若答案截图失败，需重新打开一键比对。</p>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <!-- <el-button @click="compareSettingVisible = false">取 消</el-button> -->
@@ -96,7 +106,8 @@ export default {
       compareSetting: {
         width: 1024,
         height: 960,
-        delay: 500
+        delay: 500,
+        visitType: false
       },
       compareSettingVisible: false,
 
@@ -106,6 +117,7 @@ export default {
       pageSizes: [10, 20, 30, 40, 50, 60, 80, 100],
       // 默认每页显示的条数（可修改）
       PageSize: 10
+
     }
   },
   mounted () {
@@ -149,19 +161,26 @@ export default {
       return null
     },
     // 通过id选择对应的比对文本
-    chooseQuestionText (questionId) {
+    // chooseQuestionText (questionId) {
+    //   for (let i = 0; i < this.questionList.length; i++) {
+    //     if (this.questionList[i].questionId === questionId) {
+    //       return this.questionList[i].content
+    //     }
+    //   }
+    //   return null
+    // },
+    // chooseQuestionTitle (questionId) {
+    //   for (let i = 0; i < this.questionList.length; i++) {
+    //     if (this.questionList[i].questionId === questionId) {
+    //       return this.questionList[i].title
+    //     }
+    //   }
+    //   return null
+    // },
+    chooseQuestion (questionId) {
       for (let i = 0; i < this.questionList.length; i++) {
         if (this.questionList[i].questionId === questionId) {
-          return this.questionList[i].content
-        }
-      }
-      return null
-    },
-    chooseQuestionTitle (questionId) {
-      for (let i = 0; i < this.questionList.length; i++) {
-        if (this.questionList[i].questionId === questionId) {
-          console.log('CHoose tile：', this.questionList[i].title)
-          return this.questionList[i].title
+          return this.questionList[i]
         }
       }
       return null

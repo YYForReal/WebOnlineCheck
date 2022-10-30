@@ -5,32 +5,37 @@
       <td v-text="content"></td>
       <td>过滤的HTML</td>
       <td ref="b" v-text="answerText"></td>
-
      -->
     <table class="comp-card">
       <tr class="table-header">
-        <td class="td-text"><a @click="dialogVisiable = true" style="text-decoration:underline;cursor:pointer">比对结果</a></td>
-        <td class="td-pic">参考运行截图 </td>
-        <td class="td-pic">运行截图</td>
+        <td class="td-text"><a @click="dialogVisiable = true" style="text-decoration:underline;cursor:pointer">比对结果</a>
+        </td>
+        <td class="td-pic">{{ visitType === 1 ? '参考运行截图' : '参考运行窗口' }} </td>
+        <td class="td-pic" @click="showBigIframe()" ><a >{{ visitType === 1 ? '运行截图(点我放大)' : '运行窗口(点击放大)' }}</a></td>
       </tr>
       <tr class="table-content">
         <td class="td-text">
           <div ref="result" v-html="resultHtml"></div>
         </td>
-        <td v-loading="!comparePic">
+        <td v-loading="!comparePic" v-if="visitType === 1">
           <el-popover placement="top-start" trigger="click">
             <img :src="comparePic" class="comp-image">
             <img slot="reference" :src="comparePic" class="comp-image">
           </el-popover>
         </td>
-        <td v-loading="isLoading">
-          <!-- 不使用iframe进行观察，替换为运行截图 -->
-          <!-- <iframe ref="iframe"></iframe> -->
+        <td v-else>
+          <iframe ref="qiframe"
+            :src="'http://yywebsite.cn/webcheck/#/template?questionId=' + question.questionId"></iframe>
+        </td>
+        <td v-loading="isLoading" v-if="visitType === 1">
           <el-popover placement="top-start" trigger="click">
             <!--trigger属性值：hover、click、focus 和 manual-->
             <img :src="runningPic" class="comp-image">
             <img slot="reference" :src="runningPic" class="comp-image">
           </el-popover>
+        </td>
+        <td v-else @click="showBigIframe()">
+          <iframe ref="iframe"></iframe>
         </td>
       </tr>
       <!-- <tr class="table-one-header " v-if="visitType == 1">
@@ -48,6 +53,12 @@
         <el-button type="primary" @click="dialogVisiable = false">确 定</el-button>
       </span>
     </el-dialog>
+    <el-dialog title="点击外部区域即可关闭" :visible.sync="iframeDialogVisiable" width="80%">
+      <iframe width="100%" height="700px" ref="bigIframe"></iframe>
+      <span slot="footer" class="dialog-footer">
+      </span>
+    </el-dialog>
+
   </div>
 
 </template>
@@ -72,7 +83,8 @@ export default {
       answerText: '此处显示比对的html文本内容',
       compText: '',
       resultHtml: '此处显示比对结果',
-      dialogVisiable: false
+      dialogVisiable: false,
+      iframeDialogVisiable: false
     }
   },
   mounted () {
@@ -81,6 +93,19 @@ export default {
     }, 800)
   },
   methods: {
+    showBigIframe () {
+      this.iframeDialogVisiable = true
+      setTimeout(() => {
+        const bigIframe = this.$refs.bigIframe
+
+        if (bigIframe == null) return
+        var iwindow = bigIframe.contentWindow
+        var idoc = iwindow.document // 获取iframe的document对象
+        idoc.open()
+        idoc.write(this.filterScript(this.content))
+        idoc.close()
+      }, 100)
+    },
     delHtmlTag (str) {
       // 去除所有箭头
       str = str.replace(/<[^>]+>/g, '')
@@ -124,14 +149,26 @@ export default {
       var html = arr.join('')
       this.resultHtml = html
       // 在iframe里面显示效果
-      // this.showHtml()
+      if (this.visitType === 0) {
+        // console.log('showHTML')
+        this.showHtml()
+      }
     },
     showHtml () {
       // this.$refs.iframe.src = this.content
       const iframe = this.$refs.iframe
+      const bigIframe = this.$refs.bigIframe
+
       if (iframe == null) return
       var iwindow = iframe.contentWindow // 获取iframe的window对象
       var idoc = iwindow.document // 获取iframe的document对象
+      idoc.open()
+      idoc.write(this.filterScript(this.content))
+      idoc.close()
+
+      if (bigIframe == null) return
+      iwindow = bigIframe.contentWindow
+      idoc = iwindow.document // 获取iframe的document对象
       idoc.open()
       idoc.write(this.filterScript(this.content))
       idoc.close()
@@ -159,6 +196,9 @@ export default {
       type: String,
       defalut: ''
     },
+    question: {
+      type: Object
+    },
     questionText: {
       type: String,
       default: ''
@@ -183,7 +223,12 @@ export default {
     },
     comparePic: function () { },
     runningPic: function () { },
-    isLoading: function () { }
+    isLoading: function () { },
+    visitType: function () {
+      setTimeout(() => {
+        this.showHtml()
+      }, 500)
+    }
   },
   computed: {
     account () {
@@ -260,12 +305,31 @@ export default {
 }
 
 .table-content .td-text {
+  font-size: 0.9rem;
   width: 21%;
   max-width: 350px;
+}
+
+.table-content .td-text div {
+  max-height: 500px;
+  overflow: scroll;
 }
 
 .table-content td {
   width: 38%;
   height: 300px;
 }
+
+/* 缩方iframe的内容 */
+/* iframe {
+  width: 133%!important;
+  height: 133%!important;
+  -ms-zoom: 0.75;
+  -moz-transform: scale(0.75);
+  -moz-transform-origin: 0 0;
+  -o-transform: scale(0.75);
+  -o-transform-origin: 0 0;
+  -webkit-transform: scale(0.75);
+  -webkit-transform-origin: 0 0;
+} */
 </style>
