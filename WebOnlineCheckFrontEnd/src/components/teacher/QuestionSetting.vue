@@ -151,7 +151,7 @@ export default {
           return oMyForm
         }]
       }).then((res) => {
-        console.log('Res:', res)
+        // console.log('Res:', res)
         if (res.data.status === 200) {
           this.refreshQuestionList()
           this.$message({
@@ -194,7 +194,7 @@ export default {
             return oMyForm
           }]
         }).then((res) => {
-          console.log('Res:', res)
+          // console.log('Res:', res)
           if (res.data.status === 200) {
             this.refreshQuestionList()
             this.$message({
@@ -232,7 +232,7 @@ export default {
             return oMyForm
           }]
         }).then((res) => {
-          console.log('Res:', res)
+          // console.log('Res:', res)
           if (res.data.status === 200) {
             this.refreshQuestionList()
             this.$message({
@@ -263,7 +263,7 @@ export default {
       }).then((res) => {
         this.questionList = res.data
       }).catch((err) => {
-        console.log('search /question/get: ', err)
+        console.log('refreshQuestionList /question/get: ', err)
       })
     },
     handleSumbit () {

@@ -58,17 +58,17 @@ div<template>
           <el-input type="number" v-model="compareSetting.width" placeholder="图像宽度"
             @keyup.enter.native="compareSettingVisible = false"></el-input>
         </el-form-item>
-        <el-form-item label="模拟浏览器高度（单位：px）">
+        <el-form-item label="模拟浏览器高度（单位：px）" >
           <el-input type="number" v-model="compareSetting.height" placeholder="图像高度"
             @keyup.enter.native="compareSettingVisible = false"></el-input>
         </el-form-item>
-        <el-form-item label="延迟截图时间（单位：ms）">
+        <el-form-item label="延迟截图时间（单位：ms） （若截图显示空白可调高）">
           <el-input type="number" v-model="compareSetting.delay" placeholder="延迟时间"
             @keyup.enter.native="compareSettingVisible = false"></el-input>
         </el-form-item>
-        <el-form-item label="是否使用Iframe查看（针对CSS动画）">
+        <!-- <el-form-item label="是否使用Iframe查看（针对CSS动画）">
           <el-switch v-model="compareSetting.visitType" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
-        </el-form-item>
+        </el-form-item> -->
 
         <p>若问题参考截图失败，需重新勾选问题。若答案截图失败，需重新打开一键比对。</p>
       </el-form>
@@ -120,7 +120,7 @@ export default {
 
     }
   },
-  mounted () {
+  created () {
     this.compareAnswerNumber = 0
     setTimeout(() => {
       if (this.isSending === false) {
@@ -210,7 +210,7 @@ export default {
           }
         ).then((res) => {
           if (res.data.code === 0) {
-            console.log('push', this.ansPicUrls)
+            // console.log('push', this.ansPicUrls)
             this.compareAnswerNumber++
             ansUrls.push({
               questionId: questionId,
@@ -221,7 +221,7 @@ export default {
             } else {
               // 查询结束
               if (this.autoCompare === true) {
-                console.log('autoComapre == true')
+                // console.log('autoComapre == true')
                 this.autoCompare = false
                 setTimeout(() => {
                   this.autoCompare = true // 为了触发vue的双向绑定 监听
@@ -314,7 +314,7 @@ export default {
         }
       }).then((res) => {
         this.answerList = res.data
-        console.log('answerList', this.answerList)
+        // console.log('answerList', this.answerList)
       }).catch((err) => {
         console.log('request /answer/get: ', err)
       })
@@ -326,6 +326,7 @@ export default {
       }).then((res) => {
         this.questionList = res.data
         this.canAskQuestionPic = true
+        console.log('问题列表：', this.questionList)
         // this.askPictureUrl()
       }).catch((err) => {
         console.log('request /question/get: ', err)

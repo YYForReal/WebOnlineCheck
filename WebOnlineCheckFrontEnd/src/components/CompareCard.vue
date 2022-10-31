@@ -10,32 +10,32 @@
       <tr class="table-header">
         <td class="td-text"><a @click="dialogVisiable = true" style="text-decoration:underline;cursor:pointer">比对结果</a>
         </td>
-        <td class="td-pic">{{ visitType === 1 ? '参考运行截图' : '参考运行窗口' }} </td>
-        <td class="td-pic" @click="showBigIframe()" ><a >{{ visitType === 1 ? '运行截图(点我放大)' : '运行窗口(点击放大)' }}</a></td>
+        <td class="td-pic">{{ visitType === 1 ? '参考运行窗口' : '参考运行截图' }} </td>
+        <td class="td-pic" @click="showBigIframe()"><a>{{ visitType === 1 ? '运行窗口(点击放大)' : '运行截图(点我放大)' }}</a></td>
       </tr>
       <tr class="table-content">
         <td class="td-text">
           <div ref="result" v-html="resultHtml"></div>
         </td>
-        <td v-loading="!comparePic" v-if="visitType === 1">
+        <td  v-if="visitType === 1">
+          <iframe ref="qiframe"
+            :src="'http://yywebsite.cn/webcheck/#/template?questionId=' + question.questionId"></iframe>
+        </td>
+        <td v-else v-loading="!comparePic">
           <el-popover placement="top-start" trigger="click">
             <img :src="comparePic" class="comp-image">
             <img slot="reference" :src="comparePic" class="comp-image">
           </el-popover>
         </td>
-        <td v-else>
-          <iframe ref="qiframe"
-            :src="'http://yywebsite.cn/webcheck/#/template?questionId=' + question.questionId"></iframe>
+        <td  v-if="visitType === 1" @click="showBigIframe()">
+          <iframe ref="iframe"></iframe>
         </td>
-        <td v-loading="isLoading" v-if="visitType === 1">
+        <td v-else v-loading="isLoading" >
           <el-popover placement="top-start" trigger="click">
             <!--trigger属性值：hover、click、focus 和 manual-->
             <img :src="runningPic" class="comp-image">
             <img slot="reference" :src="runningPic" class="comp-image">
           </el-popover>
-        </td>
-        <td v-else @click="showBigIframe()">
-          <iframe ref="iframe"></iframe>
         </td>
       </tr>
       <!-- <tr class="table-one-header " v-if="visitType == 1">
@@ -149,22 +149,27 @@ export default {
       var html = arr.join('')
       this.resultHtml = html
       // 在iframe里面显示效果
-      if (this.visitType === 0) {
+      if (this.visitType === 1) {
         // console.log('showHTML')
         this.showHtml()
       }
     },
     showHtml () {
       // this.$refs.iframe.src = this.content
+      const qiframe = this.$refs.qiframe
       const iframe = this.$refs.iframe
       const bigIframe = this.$refs.bigIframe
 
+      // 写入内容到答案的iframe
       if (iframe == null) return
       var iwindow = iframe.contentWindow // 获取iframe的window对象
       var idoc = iwindow.document // 获取iframe的document对象
       idoc.open()
       idoc.write(this.filterScript(this.content))
       idoc.close()
+
+      // 为了同步，同时注入src到问题的参考iframe
+      qiframe.src = 'http://yywebsite.cn/webcheck/#/template?questionId=' + this.question.questionId
 
       if (bigIframe == null) return
       iwindow = bigIframe.contentWindow

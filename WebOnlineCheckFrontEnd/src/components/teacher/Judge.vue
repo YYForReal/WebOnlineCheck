@@ -41,7 +41,7 @@
         </el-form-item> -->
       </el-form>
     </div>
-    <CompareCard :visitType="compareSetting.visitType==false?1:0"
+    <CompareCard :visitType="question.display==1?1:0"
     :content="content"
     :questionText="question.content"
     :comparePic="basePicUrl2"
