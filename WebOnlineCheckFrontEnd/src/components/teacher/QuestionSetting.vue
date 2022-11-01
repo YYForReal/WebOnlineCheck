@@ -1,57 +1,66 @@
 <template>
   <div class="container">
     <el-table :data="questionList" style="width: 100%">
-    <el-table-column type="expand">
-      <template slot-scope="props">
-        <el-form label-position="left" inline class="demo-table-expand">
-          <el-form-item label="实验标题">
-            <span>{{ props.row.title }}</span>
-          </el-form-item>
-          <el-form-item label="更新时间">
-            <span>{{ MyFilter.dateFormat(props.row.updateTime) }}</span>
-          </el-form-item>
-          <el-form-item label="比对内容" style="width:100%">
-            <span>{{ props.row.content }}</span>
-          </el-form-item>
-        </el-form>
-      </template>
-    </el-table-column>
-    <el-table-column label="实验标题" prop="title">
-    </el-table-column>
-    <!-- <el-table-column label="比对文本" prop="name">
+      <el-table-column type="expand">
+        <template slot-scope="props">
+          <el-form label-position="left" inline class="demo-table-expand">
+            <el-form-item label="实验标题">
+              <span>{{ props.row.title }}</span>
+            </el-form-item>
+            <el-form-item label="更新时间">
+              <span>{{ MyFilter.dateFormat(props.row.updateTime) }}</span>
+            </el-form-item>
+            <el-form-item label="比对内容" style="width:100%">
+              <span>{{ props.row.content }}</span>
+            </el-form-item>
+            <el-form-item label="展示方式" style="width:100%">
+              <span>{{ props.row.display == 1 ? 'iframe':'图片' }}</span>
+            </el-form-item>
+          </el-form>
+        </template>
+      </el-table-column>
+      <el-table-column label="实验标题" prop="title">
+      </el-table-column>
+      <!-- <el-table-column label="比对文本" prop="name">
     </el-table-column> -->
-    <!-- <el-table-column label="描述" prop="desc">
+      <!-- <el-table-column label="描述" prop="desc">
     </el-table-column> -->
-    <el-table-column label="操作">
-      <template slot-scope="scope">
-        <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-        <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-      </template>
-    </el-table-column>
-  </el-table>
-  <el-button type="primary" @click="handleAdd">增加</el-button>
+      <el-table-column label="操作">
+        <template slot-scope="scope">
+          <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+          <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-button type="primary" @click="handleAdd">增加</el-button>
 
-  <el-dialog :title="form.isDelete?'确认删除？':'实验题目设置'" :visible.sync="dialogFormVisible">
-  <el-form :model="form">
-    <el-form-item label="实验标题" :label-width="formLabelWidth">
-      <el-input v-model="form.title" :disabled="form.isDelete"></el-input>
-    </el-form-item>
-    <el-form-item label="比对文本" :label-width="formLabelWidth" >
-      <el-input v-model="form.content"  type="textarea" :rows="8"  :disabled="form.isDelete" ></el-input>
-    </el-form-item>
-    <el-form-item label="比对HTML" :label-width="formLabelWidth" >
-      <el-input v-model="form.html"  type="textarea"  :rows="8" :disabled="form.isDelete" ></el-input>
-    </el-form-item>
-
-    <!-- <el-form-item label="CSS属性" v-for="(attribute,index) in form.attributes" :key="index" :label-width="formLabelWidth" >
+    <el-dialog :title="form.isDelete ? '确认删除？' : '实验题目设置'" :visible.sync="dialogFormVisible">
+      <el-form :model="form">
+        <el-form-item label="实验标题" :label-width="formLabelWidth">
+          <el-input v-model="form.title" :disabled="form.isDelete"></el-input>
+        </el-form-item>
+        <el-form-item label="比对文本" :label-width="formLabelWidth">
+          <el-input v-model="form.content" type="textarea" :rows="8" :disabled="form.isDelete"></el-input>
+        </el-form-item>
+        <el-form-item label="比对HTML" :label-width="formLabelWidth">
+          <el-input v-model="form.html" type="textarea" :rows="8" :disabled="form.isDelete"></el-input>
+        </el-form-item>
+        <el-form-item label="展示方式" :label-width="formLabelWidth">
+          <!-- <el-input v-model="form.display" type="se" :rows="8" :disabled="form.isDelete"></el-input> -->
+          <el-select v-model="form.display" placeholder="选择展示方式（默认图片）" :disabled="form.isDelete">
+            <el-option label="图片"  value="0" checked />
+            <el-option label="iframe"  value="1" />
+          </el-select>
+        </el-form-item>
+        <!-- <el-form-item label="CSS属性" v-for="(attribute,index) in form.attributes" :key="index" :label-width="formLabelWidth" >
       <el-input v-model="form.content"  type="textarea"  :disabled="form.isDelete" ></el-input>
     </el-form-item> -->
-  </el-form>
-  <div slot="footer" class="dialog-footer">
-    <el-button @click="dialogFormVisible = false">取 消</el-button>
-    <el-button type="primary" @click="handleConfirm">确 定</el-button>
-  </div>
-</el-dialog>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="handleConfirm">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
   <!-- <el-form ref="QuestionForm" :model="form" :rules="rules" class="setting-container">
     <h2>提交答案</h2>
@@ -97,7 +106,8 @@ export default {
         userId: null,
         username: null,
         html: null,
-        isDelete: false
+        isDelete: false,
+        display: 0
         // attributes: []
       },
       formLabelWidth: '120px'
@@ -116,23 +126,26 @@ export default {
       this.form.content = null
       this.form.title = null
       this.form.html = null
+      this.form.display = 0
       this.form.isDelete = false
     },
     handleEdit (index, row) {
-      // console.log(index, row)
       this.dialogFormVisible = true
       this.form.questionId = row.questionId
       this.form.content = row.content
       this.form.title = row.title
       this.form.html = row.html
+      this.form.display = row.display
       this.form.isDelete = false
     },
     handleDelete (index, row) {
-      this.dialogFormVisible = true
-      this.form.questionId = row.questionId
-      this.form.content = row.content
-      this.form.title = row.title
-      this.form.html = row.html
+      this.handleEdit(index, row)
+      // this.dialogFormVisible = true
+      // this.form.questionId = row.questionId
+      // this.form.content = row.content
+      // this.form.title = row.title
+      // this.form.html = row.html
+      // this.form.display = row.display
       this.form.isDelete = true
     },
     handleConfirm () {
@@ -191,6 +204,7 @@ export default {
             oMyForm.append('title', this.form.title)
             oMyForm.append('content', this.form.content)
             oMyForm.append('html', this.form.html)
+            oMyForm.append('display', this.form.display)
             return oMyForm
           }]
         }).then((res) => {
@@ -229,6 +243,7 @@ export default {
             oMyForm.append('content', this.form.content)
             oMyForm.append('questionId', this.form.questionId)
             oMyForm.append('html', this.form.html)
+            oMyForm.append('display', this.form.display)
             return oMyForm
           }]
         }).then((res) => {
@@ -313,8 +328,8 @@ export default {
 }
 </script>
 <style scoped >
-.container{
-  width:100%;
+.container {
+  width: 100%;
 }
 
 .demo-table-expand {
@@ -332,8 +347,7 @@ export default {
   width: 50%;
 }
 
-.demo-table-expand >>> .el-form-item__label{
+.demo-table-expand>>>.el-form-item__label {
   font-weight: bold;
 }
-
 </style>
