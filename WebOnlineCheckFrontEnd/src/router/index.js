@@ -14,6 +14,7 @@ const QuestionSetting = () => import('@/components/teacher/QuestionSetting')
 const TemplateHtml = () => import('@/components/student/TemplateHtml')
 const ImgList = () => import('@/components/student/ImgList')
 const ImgSetting = () => import('@/components/teacher/ImgSetting')
+const CodeSetting = () => import('@/components/teacher/CodeSetting')
 
 Vue.use(Router)// 注册vue-router
 
@@ -75,6 +76,10 @@ export default new Router({
               path: 'img-setting',
               name: 'ImgSetting',
               component: ImgSetting
+            }, {
+              path: 'code-setting',
+              name: 'CodeSetting',
+              component: CodeSetting
             }
           ]
         }

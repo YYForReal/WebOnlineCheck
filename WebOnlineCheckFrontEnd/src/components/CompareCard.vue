@@ -8,18 +8,19 @@
      -->
     <table class="comp-card">
       <tr class="table-header">
-        <td class="td-text"><a @click="dialogVisiable = true" style="text-decoration:underline;cursor:pointer">比对结果</a>
-        </td>
+        <td v-if="question.example !=null">JS校验代码</td>
+        <td v-else class="td-text"><a @click="dialogVisiable = true" style="text-decoration:underline;cursor:pointer">比对结果</a></td>
         <td class="td-pic">{{ visitType === 1 ? '参考运行窗口' : '参考运行截图' }} </td>
         <td class="td-pic" @click="showBigIframe()"><a>{{ visitType === 1 ? '运行窗口(点击放大)' : '运行截图(点我放大)' }}</a></td>
       </tr>
       <tr class="table-content">
-        <td class="td-text">
+        <td v-if="question.example !=null"> {{JSCheckResult}}</td>
+        <td v-else class="td-text" >
           <div ref="result" v-html="resultHtml"></div>
         </td>
         <td  v-if="visitType === 1">
-          <iframe ref="qiframe"
-            :src="'http://yywebsite.cn/webcheck/#/template?questionId=' + question.questionId"></iframe>
+          <iframe ref="qiframe" sandbox='allow-scripts allow-same-origin'
+            :src="'http://yywebsite.cn/webcheck/#/template?question=' + question.questionId"></iframe>
         </td>
         <td v-else v-loading="!comparePic">
           <el-popover placement="top-start" trigger="click">
@@ -28,7 +29,7 @@
           </el-popover>
         </td>
         <td  v-if="visitType === 1" @click="showBigIframe()">
-          <iframe ref="iframe"></iframe>
+          <iframe ref="iframe" sandbox='allow-scripts allow-same-origin'></iframe>
         </td>
         <td v-else v-loading="isLoading" >
           <el-popover placement="top-start" trigger="click">
@@ -40,9 +41,8 @@
       </tr>
       <!-- <tr class="table-one-header " v-if="visitType == 1">
     </tr>
-    <tr v-if="visitType == 1">
+    <tr v-if="visitType == 1"></tr> -->
 
-    </tr> -->
     </table>
     <el-dialog title="详细信息" :visible.sync="dialogVisiable" width="50%">
       <h3>原内容</h3>
@@ -54,7 +54,7 @@
       </span>
     </el-dialog>
     <el-dialog title="点击外部区域即可关闭" :visible.sync="iframeDialogVisiable" width="80%">
-      <iframe width="100%" height="700px" ref="bigIframe"></iframe>
+      <iframe width="100%" height="700px" ref="bigIframe" sandbox='allow-scripts allow-same-origin'></iframe>
       <span slot="footer" class="dialog-footer">
       </span>
     </el-dialog>
@@ -196,6 +196,10 @@ export default {
     visitType: {
       type: Number,
       default: 0
+    },
+    JSCheckResult: {
+      type: String,
+      default: 'JS尚无比对结果'
     },
     content: {
       type: String,

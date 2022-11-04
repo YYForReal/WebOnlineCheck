@@ -270,12 +270,12 @@ export default {
     font-weight: bold;
 }
 
-.fix-button{
+/* .fix-button{
   position: fixed;
   width:70px;
   height:70px;
   font-size: 40px;
   right:50px;
   bottom:100px;
-}
+} */
 </style>

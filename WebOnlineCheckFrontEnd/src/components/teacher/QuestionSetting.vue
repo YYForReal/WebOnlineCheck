@@ -10,11 +10,21 @@
             <el-form-item label="更新时间">
               <span>{{ MyFilter.dateFormat(props.row.updateTime) }}</span>
             </el-form-item>
+            <el-form-item label="展示方式" >
+              <span>{{ props.row.display == 1 ? 'iframe' : '图片' }}</span>
+            </el-form-item>
+              <!-- v-if="props.row.description" -->
+
+            <el-form-item label="说明内容" >
+              <span>{{ props.row.description }}</span>
+            </el-form-item>
+
             <el-form-item label="比对内容" style="width:100%">
               <span>{{ props.row.content }}</span>
             </el-form-item>
-            <el-form-item label="展示方式" style="width:100%">
-              <span>{{ props.row.display == 1 ? 'iframe':'图片' }}</span>
+            <!-- v-if="props.row.example" -->
+            <el-form-item label="模板HTML" style="width:100%" >
+              <span>{{ props.row.example }}</span>
             </el-form-item>
           </el-form>
         </template>
@@ -32,26 +42,34 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-button type="primary" @click="handleAdd">增加</el-button>
+    <!-- <el-button type="primary" @click="handleAdd">增加</el-button> -->
+    <el-button class="fix-button" type="primary" icon="el-icon-edit" circle @click="handleAdd" ></el-button>
 
     <el-dialog :title="form.isDelete ? '确认删除？' : '实验题目设置'" :visible.sync="dialogFormVisible">
       <el-form :model="form">
         <el-form-item label="实验标题" :label-width="formLabelWidth">
-          <el-input v-model="form.title" :disabled="form.isDelete"></el-input>
+          <el-input v-model="form.title" :disabled="form.isDelete" placeholder = "实验的标题"></el-input>
         </el-form-item>
         <el-form-item label="比对文本" :label-width="formLabelWidth">
-          <el-input v-model="form.content" type="textarea" :rows="8" :disabled="form.isDelete"></el-input>
+          <el-input v-model="form.content" type="textarea" :rows="8" placeholder = "需要比对的页面文本" :disabled="form.isDelete"></el-input>
         </el-form-item>
         <el-form-item label="比对HTML" :label-width="formLabelWidth">
-          <el-input v-model="form.html" type="textarea" :rows="8" :disabled="form.isDelete"></el-input>
+          <el-input v-model="form.html" type="textarea" :rows="8" placeholder = "参考答案" :disabled="form.isDelete"></el-input>
         </el-form-item>
         <el-form-item label="展示方式" :label-width="formLabelWidth">
           <!-- <el-input v-model="form.display" type="se" :rows="8" :disabled="form.isDelete"></el-input> -->
           <el-select v-model="form.display" placeholder="选择展示方式（默认图片）" :disabled="form.isDelete">
-            <el-option label="图片"  value="0" checked />
-            <el-option label="iframe"  value="1" />
+            <el-option label="图片" value="0" checked />
+            <el-option label="iframe" value="1" />
           </el-select>
         </el-form-item>
+        <el-form-item label="实验说明内容" :label-width="formLabelWidth">
+          <el-input v-model="form.description" type="textarea" placeholder = "展示给学生的说明性文本" :rows="8" :disabled="form.isDelete"></el-input>
+        </el-form-item>
+        <el-form-item label="模板HTML" :label-width="formLabelWidth">
+          <el-input v-model="form.example" type="textarea" :rows="8" placeholder = "展示给学生的模板HTML，方便测试Javascript"  :disabled="form.isDelete"></el-input>
+        </el-form-item>
+
         <!-- <el-form-item label="CSS属性" v-for="(attribute,index) in form.attributes" :key="index" :label-width="formLabelWidth" >
       <el-input v-model="form.content"  type="textarea"  :disabled="form.isDelete" ></el-input>
     </el-form-item> -->
@@ -107,7 +125,9 @@ export default {
         username: null,
         html: null,
         isDelete: false,
-        display: 0
+        display: 0,
+        description: null,
+        example: null
         // attributes: []
       },
       formLabelWidth: '120px'
@@ -128,6 +148,8 @@ export default {
       this.form.html = null
       this.form.display = 0
       this.form.isDelete = false
+      this.form.description = ''
+      this.form.example = ''
     },
     handleEdit (index, row) {
       this.dialogFormVisible = true
@@ -137,15 +159,11 @@ export default {
       this.form.html = row.html
       this.form.display = row.display
       this.form.isDelete = false
+      this.form.description = row.description
+      this.form.example = row.example
     },
     handleDelete (index, row) {
       this.handleEdit(index, row)
-      // this.dialogFormVisible = true
-      // this.form.questionId = row.questionId
-      // this.form.content = row.content
-      // this.form.title = row.title
-      // this.form.html = row.html
-      // this.form.display = row.display
       this.form.isDelete = true
     },
     handleConfirm () {
@@ -204,6 +222,9 @@ export default {
             oMyForm.append('title', this.form.title)
             oMyForm.append('content', this.form.content)
             oMyForm.append('html', this.form.html)
+            oMyForm.append('description', this.form.description)
+            oMyForm.append('example', this.form.example)
+
             oMyForm.append('display', this.form.display)
             return oMyForm
           }]
@@ -243,6 +264,8 @@ export default {
             oMyForm.append('content', this.form.content)
             oMyForm.append('questionId', this.form.questionId)
             oMyForm.append('html', this.form.html)
+            oMyForm.append('description', this.form.description)
+            oMyForm.append('example', this.form.example)
             oMyForm.append('display', this.form.display)
             return oMyForm
           }]
@@ -349,5 +372,14 @@ export default {
 
 .demo-table-expand>>>.el-form-item__label {
   font-weight: bold;
+}
+
+.fix-button{
+  position: fixed;
+  width:70px;
+  height:70px;
+  font-size: 40px;
+  right:50px;
+  bottom:100px;
 }
 </style>

@@ -196,7 +196,7 @@ export default {
     askOnePic (questionId) {
       const ansUrls = this.ansPicUrls
       return new Promise((resolve, reject) => {
-        let pageUrl = 'http://yywebsite.cn/webcheck/#/template?questionId=' + questionId
+        let pageUrl = 'http://yywebsite.cn/webcheck/#/template?question=' + questionId
         let width = this.compareSetting.width
         let height = this.compareSetting.height
         let timeout = 40000
@@ -468,7 +468,7 @@ export default {
 </script>
 <style scoped>
 .judge-table {
-  width: 100%;
+  width: 98%;
   padding: 5px 10px;
 }
 

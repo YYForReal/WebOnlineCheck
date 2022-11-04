@@ -18,6 +18,10 @@
           <i class="el-icon-setting"></i>
           <span slot="title">实验设置</span>
         </el-menu-item>
+        <el-menu-item index="code-setting">
+          <i class="el-icon-edit"></i>
+          <span slot="title">校验代码编辑</span>
+        </el-menu-item>
         <!-- <el-menu-item index="login-record">
           <i class="el-icon-user-solid"></i>
           <span slot="title">登录日志</span>
@@ -71,8 +75,17 @@ export default {
   }
 }
 </script>
-<style scoped>
+<style >
 .tac {
   width: 100%;
 }
+
+/* .fix-button{
+  position: fixed;
+  width:70px;
+  height:70px;
+  font-size: 40px;
+  right:50px;
+  bottom:100px;
+} */
 </style>

@@ -21,7 +21,7 @@
             <!-- <el-input class="form-span" v-bind="" disabled="disabled"></el-input> -->
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="viewEffect(answer.answerId)">查看效果</el-button>
+            <el-button type="primary" @click="viewEffect(answer.answerId,answer.questionId)">查看效果</el-button>
           </el-form-item>
           <!-- <el-form-item label="相似度:">
             <el-input class="form-span" v-loading="!similarity" v-model="similarity" disabled="disabled"></el-input>
@@ -82,8 +82,14 @@ export default {
     // }
   },
   methods: {
-    viewEffect (answerId) {
-      window.open('http://yywebsite.cn/webcheck/#/template?answerId=' + answerId + '&userId=' + window.decodeURIComponent(window.atob(this.account.userid)), '_blank') // 注意第二个参数
+    viewEffect (answerId, questionId) {
+      let url = 'http://yywebsite.cn/webcheck/#/template'
+      let answerIdStr = '?answer=' + answerId
+      let userStr = '&user=' + window.decodeURIComponent(window.atob(this.account.userid))
+      let questionStr = '&question=' + questionId
+      window.open(url + answerIdStr + userStr + questionStr, '_blank') // 注意第二个参数
+      // window.open('http://yywebsite.cn/webcheck/#/template?answerId=' + answerId + '&userId=' + window.decodeURIComponent(window.atob(this.account.userid)), '_blank') // 注意第二个参数
+
       // window.open('http://localhost:8081/#/template?answerId=' + answerId + '&userId=' + this.$md5(this.account.userid), '_blank') // 注意第二个参数
     },
     formatTime (str) {

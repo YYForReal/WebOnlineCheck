@@ -55,10 +55,8 @@ export default {
         if (valid) {
           this.checkUser()
             .then((response) => {
-              // console.log(response)
               if (response.data === 'OK') {
                 this.checkUserType().then((res) => {
-                  // console.log(res)
                   if (res.data == null) {
                     console.error('不可能出现的事情 发生了！')
                   } else if (res.data.type === 1) {

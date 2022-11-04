@@ -41,14 +41,8 @@
         </el-form-item> -->
       </el-form>
     </div>
-    <CompareCard :visitType="question.display==1?1:0"
-    :content="content"
-    :questionText="question.content"
-    :comparePic="basePicUrl2"
-    :runningPic="basePicUrl"
-    :isLoading="isLoading"
-    :question="question"
-    />
+    <CompareCard :visitType="question.display == 1 ? 1 : 0" :content="content" :questionText="question.content"
+      :comparePic="basePicUrl2" :runningPic="basePicUrl" :isLoading="isLoading" :question="question" :JSCheckResult="JSCheckResult" />
   </el-card>
 </template>
 
@@ -66,7 +60,9 @@ export default {
       basePicUrl: 'https://source.acexy.cn/view/YPIBluo',
       similarity: null,
       isLoading: false,
-      isLoading2: false
+      isLoading2: false,
+      JSCheckResult: '',
+      failTimes: 1
     }
   },
   components: {
@@ -83,7 +79,11 @@ export default {
       return MyFilter.dateFormat(time)
     },
     viewEffect () {
-      window.open('http://yywebsite.cn/webcheck/#/template?answerId=' + this.answerId, '_blank') // 注意第二个参数
+      let url = 'http://yywebsite.cn/webcheck/#/template'
+      let answerStr = '?answer=' + this.answerId
+      let questionStr = '&question=' + this.question.questionId
+
+      window.open(url + answerStr + questionStr, '_blank') // 在一个新页面打开
     },
     askForSimilarity (pic1, pic2) {
       this.axios({
@@ -110,7 +110,7 @@ export default {
       this.isLoading = true
       this.isLoading2 = true
       // let pageUrl = 'http://yywebsite.cn/'
-      let pageUrl = 'http://yywebsite.cn/webcheck/#/template' + '?answerId=' + this.answerId
+      let pageUrl = 'http://yywebsite.cn/webcheck/#/template' + '?answer=' + this.answerId + '&question=' + this.question.questionId
       let width = this.compareSetting.width
       let height = this.compareSetting.height
       let timeout = 40000
@@ -134,6 +134,7 @@ export default {
           // this.basePicUrl2 = this.$emit('getQuestionBase')
           // console.log('答案的base转码为:', this.basePicUrl2)
           this.askForSimilarity(this.basePicUrl, this.basePicUrl2)
+          this.askForCheck(this.question.questionId, this.answerId)
         } else {
           console.log(res.data.message)
         }
@@ -226,6 +227,31 @@ export default {
         })
         console.log(err)
       })
+    },
+    askForCheck (questionId, answerId) {
+      console.log('askForCheck:', questionId, answerId)
+      return this.axios({
+        url: this.baseUrl + '/code/result/get?questionId=' + questionId + '&answerId=' + answerId,
+        method: 'get'
+        // transformRequest: [(data) => {
+        //   var oMyForm = new FormData()
+        //   oMyForm.append('questionId', questionId)
+        //   oMyForm.append('answerId', answerId)
+        //   return oMyForm
+        // }]
+      }).then((res) => {
+        if (res.data.status === 400) {
+          this.JSCheckResult = res.data.message
+        } else if (res.data.status === 200) {
+          this.JSCheckResult = res.data.data
+        }
+      }).catch((err) => {
+        console.log('Search Result：', err)
+        setTimeout(() => {
+          this.failTimes = this.failTimes * 2
+          this.askForCheck(questionId, answerId)
+        }, this.failTimes * 1000)
+      })
     }
   },
   props: {
@@ -282,7 +308,7 @@ export default {
         return {
           width: 1024,
           height: 960,
-          delay: 500
+          delay: 1000
         }
       }
     }
@@ -294,14 +320,14 @@ export default {
       this.newScore = val
     },
     autoCompare: function (val) {
-      console.log('change SOn')
+      // console.log('change SOn')
       if (val === true) {
         console.log('auto')
         this.picCompare()
       }
     },
     active: function (val) {
-      console.log('change', this.$refs.star.style)
+      // console.log('change', this.$refs.star.style)
       // let str = this.questionTitle
       let str = this.question.title
       if (val === true) {

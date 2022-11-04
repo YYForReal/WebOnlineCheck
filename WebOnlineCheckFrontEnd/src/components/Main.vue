@@ -13,9 +13,10 @@
           </el-menu-item>
           <el-menu-item index="answer">
             <i class="el-icon-menu"></i>
-            <span slot="title">提交答案</span>
+            <span slot="title">实验提交</span>
           </el-menu-item>
         </el-menu>
+        <!-- <span class="registration">123123</span> -->
       </el-col>
       <el-col :span="21">
         <router-view></router-view>
