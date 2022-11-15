@@ -3,15 +3,15 @@
     <el-row class="tac">
       <el-col class="side-bar" :span="3">
         <el-menu default-active="list" class="el-menu-vertical" :router="true">
-          <el-menu-item index="list" >
+          <el-menu-item index="list" id="doc-list">
             <i class="el-icon-document"></i>
             <span slot="title">已提交列表</span>
           </el-menu-item>
-          <el-menu-item index="imgs" >
+          <el-menu-item index="imgs">
             <i class="el-icon-s-promotion"></i>
             <span slot="title">参考图片链接</span>
           </el-menu-item>
-          <el-menu-item index="answer">
+          <el-menu-item index="answer" id="answer-item">
             <i class="el-icon-menu"></i>
             <span slot="title">实验提交</span>
           </el-menu-item>
@@ -19,16 +19,130 @@
         <!-- <span class="registration">123123</span> -->
       </el-col>
       <el-col :span="21">
+        <el-badge value="HTML" class="item">
+          <el-button type="info" class="fix-button" icon="el-icon-message" @click="dialogVisible = true" circle>
+          </el-button>
+        </el-badge>
+        <el-badge value="JS" class="item-js">
+          <el-button type="info" class="fix-button-js" icon="el-icon-message" @click="dialogVisibleJS = true" circle>
+          </el-button>
+        </el-badge>
         <router-view></router-view>
       </el-col>
     </el-row>
+    <!-- 一些无法展示效果的案例 -->
+    <el-dialog title="一些无法展示效果的案例" :visible.sync="dialogVisible" width="90%" class="carousel-container">
+      <el-carousel :interval="4500">
+        <!-- v-for="answer in scoreList" :key="answer.answerId" :title="answer.questionTitle" -->
+        <!-- :name="answer.answerId" -->
+        <el-carousel-item v-for="(tip, index) in dialogTips" :key="index" :title="tip.title">
+          <!-- <el-divider content-position="left" >{{}}</el-divider> -->
+          <h2>{{ tip.title }}</h2>
+          <p>{{ tip.content }}</p>
+          <div class="code-box-container">
+            <div class="code-box">
+              <p v-if="tip.errorCode">冲突代码</p>
+              <pre v-if="tip.errorCode"><code>{{tip.errorCode}}</code></pre>
+            </div>
+            <div class="code-box">
+              <p v-if="tip.rightCode">有效代码</p>
+              <pre v-if="tip.rightCode"><code>{{tip.rightCode}}</code></pre>
+              <!-- <el-input type="textarea" disabled rows="8" v-if="tip.rightCode" v-model="tip.rightCode"></el-input> -->
+            </div>
+          </div>
+        </el-carousel-item>
+        <!-- <el-divider><i class="el-icon-mobile-phone"></i></el-divider> -->
+        <!-- <el-divider content-position="right">阿里云</el-divider> -->
+      </el-carousel>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- 一些JS错误的代码 -->
+    <el-dialog title="JS实验无效代码" :visible.sync="dialogVisibleJS" width="90%" class="carousel-container">
+      <el-carousel :interval="4500">
+        <el-carousel-item v-for="(tip, index) in dialogJSTips" :key="index" :title="tip.title">
+          <h2>{{ tip.title }}</h2>
+          <p v-html="tip.content"></p>
+          <div class="code-box-container">
+            <div class="code-box">
+              <p v-if="tip.errorCode">冲突代码</p>
+              <pre v-if="tip.errorCode"><code>{{tip.errorCode}}</code></pre>
+              <!-- <el-input type="textarea" disabled rows="8" v-if="tip.errorCode" v-model="tip.errorCode"></el-input> -->
+            </div>
+            <div class="code-box">
+              <p v-if="tip.rightCode">有效代码</p>
+              <pre v-if="tip.rightCode"><code>{{tip.rightCode}}</code></pre>
+              <!-- <el-input type="textarea" disabled rows="8" v-if="tip.rightCode" v-model="tip.rightCode"></el-input> -->
+            </div>
+          </div>
+        </el-carousel-item>
+        <!-- <el-divider><i class="el-icon-mobile-phone"></i></el-divider> -->
+        <!-- <el-divider content-position="right">阿里云</el-divider> -->
+      </el-carousel>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogVisibleJS = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-
+// import Driver from 'Driver'
 export default {
   name: 'Main',
+  data () {
+    return {
+      timer: null,
+      dialogVisible: false,
+      dialogTips: [
+        {
+          title: 'div选择器的问题',
+          content: '因为预览的HTML结构最外层套了两层的div，所以为了避免影响外部div的样式。尽量减少使用div标签选择器',
+          errorCode: '<style>\n\tdiv{\n\t\t...\n\t}\n</style>\n\n<div class="box"></div>',
+          rightCode: '<style>\n\t.box{\n\t\t...\n\t}\n</style>\n\n<div class="box"></div>'
+        },
+        {
+          title: 'body标签的行内样式',
+          content: '不要把body的样式写在body标签内，可以考虑写在内部样式表内。',
+          errorCode: '<body bgcolor="#123456"></body>',
+          rightCode: `<style>\n\tbody{\n\t\tbackground-color:"#123456";\n\t}\n</style>`
+        },
+        {
+          title: '内部样式表的大小写问题',
+          content: '如果内部样式表和HTML标签大小写不匹配，也会没有效果。HTML可以全用小写字母和字符“-”',
+          errorCode: '<style>\n\t#hello{\n\t\t...\n\t}\n</style>\n\n<p id="#Hello"></p>',
+          rightCode: '<style>\n\t#hello-box{\n\t\t...\n\t}\n</style>\n\n<p id="#hello-box"></p>'
+        }
+      ],
+      dialogVisibleJS: false,
+      dialogJSTips: [
+        {
+          title: '变量声明',
+          content: '网站提交的代码中，JS变量需声明（var、let、const），若不声明而直接使用，本地虽然可以，但网站会报错。',
+          errorCode: 'count = 1 ;\nfor(i=0;i<10;i++){\n\t...\n}',
+          rightCode: 'var count = 1 ; \nfor(var i=0;i<10;i++){\n\t...\n}'
+        },
+        {
+          title: '使用document.write务必不要增加HTML标签',
+          content: '不同于本地直接调用script。网站检查将<b>异步</b>调用代码：使用document.write()会覆盖原有的DOM结构。<br>具体原因可见：<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Document/write" target="_blank">https://developer.mozilla.org/zh-CN/docs/Web/API/Document/write</a>'
+        },
+        {
+          title: '对HTML结构的操作',
+          content: '不可使用document.write方法，需通过document.getElementByXXX等方法操作DOM对象进行内容修改。'
+        }
+
+        // {
+        //   title: '增加分号',
+        //   content: '网站提交的代码中，JS语句需增加分号，若不增加，本地虽然可以，但网站可能会报错。',
+        //   errorCode: 'var count = 1 \ncount ++',
+        //   rightCode: 'var count = 1 ; \ncount ++;'
+        // }
+
+      ]
+    }
+  },
   computed: {
     account () {
       return this.$store.state.account
@@ -45,6 +159,61 @@ export default {
         this.$store.dispatch('handleLogin', obj)
       }
     }
+  },
+  mounted () {
+    // eslint-disable-next-line no-undef
+    const driver = new Driver({
+      allowClose: false, // 禁止点击外部关闭
+      doneBtnText: '完成', // 完成按钮标题
+      stageBackground: '#fff', // 引导对话的背景色
+      closeBtnText: '关闭', // 关闭按钮标题
+      animate: true,
+      nextBtnText: '下一步', // 下一步按钮标题
+      prevBtnText: '上一步' // 上一步按钮标题
+    })
+    // 定义步骤
+    driver.defineSteps([
+      {
+        element: '#answer-item',
+        popover: {
+          className: 'first-step-popover-class',
+          title: 'HTML模板获取',
+          description: '本周实验的HTML模板需先选择最新的实验获取',
+          position: 'right'
+        }
+      },
+      {
+        element: '#doc-list',
+        popover: {
+          title: '代码复查',
+          description: '提交HTML内容后务必返回此处-点击查看效果阅览',
+          position: 'right'
+        }
+      }
+    ])
+    window.localStorage.removeItem('web-guide')
+    let guide = window.localStorage.getItem('web-guide1')
+    // console.log(JSON.parse(guide))
+    this.timer = setTimeout(() => {
+      // 开始引导
+      if (guide == null) {
+        guide = {}
+        guide.main = 'true'
+        window.localStorage.setItem('web-guide1', JSON.stringify(guide))
+        driver.start()
+      } else if (JSON.parse(guide).main == null) {
+        let newGuide = JSON.parse(guide)
+        // console.log(newGuide)
+        newGuide['main'] = 'true'
+        // newGuide.defineProperty('main', 'true')
+        window.localStorage.setItem('web-guide1', JSON.stringify(newGuide))
+        driver.start()
+      }
+    }, 500)
+  },
+  destroyed () {
+    if (this.timer != null) { clearTimeout(this.timer) }
+    this.timer = null
   }
 }
 </script>
@@ -62,4 +231,64 @@ export default {
   min-width: 0;
 } */
 
+/* 弹窗示例 */
+.carousel-container {
+  width: 85%;
+  text-align: center;
+  margin: 0 auto;
+}
+
+.html-text-box>>>.el-textarea__inner {
+  height: 400px;
+}
+
+.code-box-container {
+  display: flex;
+  width: 80%;
+  margin: 0 auto;
+  justify-content: space-between;
+  text-align: left;
+}
+
+.code-box {
+  width: 45%;
+}
+
+.item,
+.item-js {
+  width: 50px;
+  height: 50px;
+  z-index: 20;
+  /* animation: put-aside 1s ;
+  animation-fill-mode: forwards;
+  transition: all 15s; */
+}
+
+.item {
+  position: fixed;
+  right: 60px;
+  bottom: 110px;
+}
+
+.item-js {
+  position: fixed;
+  right: 60px;
+  bottom: 190px;
+}
+
+.item>>>.el-badge__content,
+.item-js>>>.el-badge__content {
+  z-index: 20;
+}
+
+/* 编辑增加按钮 */
+.fix-button-js {
+  position: fixed;
+  width: 60px;
+  height: 60px;
+  font-size: 36px;
+  right: 50px;
+  bottom: 180px;
+  z-index: 10;
+}
 </style>

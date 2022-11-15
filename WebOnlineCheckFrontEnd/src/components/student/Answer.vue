@@ -11,14 +11,10 @@
         <el-button type="primary" @click="handleSumbit" :loading="logining">提交</el-button>
       </el-form-item>
     </div>
-    <blockquote class="question-description" v-if="(nowQuestion && nowQuestion.description)">
-      {{ nowQuestion.description }}
-    </blockquote>
-    <div class="question-example-box code-box" v-if="(nowQuestion && nowQuestion.example)" >
+    <blockquote class="question-description" v-if="(nowQuestion && nowQuestion.description)" v-html="nowQuestion.description"></blockquote>
+    <div class="question-example-box code-box" v-if="(nowQuestion && nowQuestion.example)">
       <el-button type="primary" class="copy-btn" @click="copyCode(nowQuestion.example)">复制代码</el-button>
-      <pre>
-        <code>{{ nowQuestion.example | trim }}</code>
-      </pre>
+      <pre><code>{{ nowQuestion.example | trim }}</code></pre>
     </div>
     <h2>提交答案</h2>
     <el-form-item prop="content">
@@ -26,16 +22,13 @@
         placeholder="在此输入html"></el-input>
     </el-form-item>
 
-    <el-badge value="new" class="item">
-      <el-button type="info" class="fix-button" icon="el-icon-message" @click="dialogVisible = true" circle></el-button>
-    </el-badge>
+    <!-- <el-badge value="new" class="item"> -->
+      <!-- <el-button type="info" class="fix-button" icon="el-icon-message" @click="dialogVisible = true" circle></el-button> -->
+    <!-- </el-badge> -->
 
-    <el-dialog title="一些无法展示效果的案例" :visible.sync="dialogVisible" width="80%">
+    <!-- <el-dialog title="一些无法展示效果的案例" :visible.sync="dialogVisible" width="80%">
       <el-carousel :interval="4000">
-        <!-- v-for="answer in scoreList" :key="answer.answerId" :title="answer.questionTitle" -->
-        <!-- :name="answer.answerId" -->
         <el-carousel-item v-for="(tip, index) in dialogTips" :key="index" :title="tip.title">
-          <!-- <el-divider content-position="left" >{{}}</el-divider> -->
           <h2>{{ tip.title }}</h2>
           <p>{{ tip.content }}</p>
           <div class="code-box-container">
@@ -49,13 +42,11 @@
             </div>
           </div>
         </el-carousel-item>
-        <!-- <el-divider><i class="el-icon-mobile-phone"></i></el-divider> -->
-        <!-- <el-divider content-position="right">阿里云</el-divider> -->
       </el-carousel>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
       </span>
-    </el-dialog>
+    </el-dialog> -->
 
   </el-form>
 </template>
@@ -82,27 +73,29 @@ export default {
       },
       questionList: [],
       // 弹窗
-      dialogVisible: false,
-      dialogTips: [
-        {
-          title: 'div选择器的问题',
-          content: '因为预览的HTML结构最外层套了两层的div，所以为了避免影响外部div的样式。尽量减少使用div标签选择器',
-          errorCode: '<style>\n\tdiv{\n\t\t...\n\t}\n</style>\n\n<div class="box"></div>',
-          rightCode: '<style>\n\t.box{\n\t\t...\n\t}\n</style>\n\n<div class="box"></div>'
-        },
-        {
-          title: 'body标签的行内样式',
-          content: '不要把body的样式写在body标签内，可以考虑写在内部样式表内。',
-          errorCode: '<body bgcolor="#123456"></body>',
-          rightCode: `<style>\n\tbody{\n\t\tbackground-color:"#123456";\n\t}\n</style>`
-        },
-        {
-          title: '内部样式表的大小写问题',
-          content: '如果内部样式表和HTML标签大小写不匹配，也会没有效果。HTML可以全用小写字母和字符“-”',
-          errorCode: '<style>\n\t#hello{\n\t\t...\n\t}\n</style>\n\n<p id="#Hello"></p>',
-          rightCode: '<style>\n\t#hello-box{\n\t\t...\n\t}\n</style>\n\n<p id="#hello-box"></p>'
-        }
-      ]
+      // dialogVisible: false,
+      // dialogTips: [
+      //   {
+      //     title: 'div选择器的问题',
+      //     content: '因为预览的HTML结构最外层套了两层的div，所以为了避免影响外部div的样式。尽量减少使用div标签选择器',
+      //     errorCode: '<style>\n\tdiv{\n\t\t...\n\t}\n</style>\n\n<div class="box"></div>',
+      //     rightCode: '<style>\n\t.box{\n\t\t...\n\t}\n</style>\n\n<div class="box"></div>'
+      //   },
+      //   {
+      //     title: 'body标签的行内样式',
+      //     content: '不要把body的样式写在body标签内，可以考虑写在内部样式表内。',
+      //     errorCode: '<body bgcolor="#123456"></body>',
+      //     rightCode: `<style>\n\tbody{\n\t\tbackground-color:"#123456";\n\t}\n</style>`
+      //   },
+      //   {
+      //     title: '内部样式表的大小写问题',
+      //     content: '如果内部样式表和HTML标签大小写不匹配，也会没有效果。HTML可以全用小写字母和字符“-”',
+      //     errorCode: '<style>\n\t#hello{\n\t\t...\n\t}\n</style>\n\n<p id="#Hello"></p>',
+      //     rightCode: '<style>\n\t#hello-box{\n\t\t...\n\t}\n</style>\n\n<p id="#hello-box"></p>'
+      //   }
+      // ],
+      driver: null,
+      guide: false
     }
   },
   components: {
@@ -213,6 +206,54 @@ export default {
           showClose: true
         })
       })
+    },
+    initDriver () {
+      setTimeout(() => {
+        // eslint-disable-next-line no-undef
+        this.driver = new Driver({
+          allowClose: false, // 禁止点击外部关闭
+          doneBtnText: '完成', // 完成按钮标题
+          closeBtnText: '关闭', // 关闭按钮标题
+          stageBackground: '#fff', // 引导对话的背景色
+          animate: true,
+          nextBtnText: '下一步', // 下一步按钮标题
+          prevBtnText: '上一步' // 上一步按钮标题
+
+        })
+        // 定义步骤
+        this.driver.defineSteps([
+          {
+            element: '.question-example-box',
+            popover: {
+              title: '请使用HTML模板！',
+              description: '注意：实验需使用提供的HTML模板，为了正确的校验结果，请不要修改其中的HTML结构。',
+              position: 'top-center'
+            }
+          },
+          {
+            element: '.html-text-box',
+            popover: {
+              title: '代码输入',
+              description: '最底下依旧提交HTML内容',
+              position: 'top-center'
+            }
+          },
+          {
+            element: '.submit-btn-box',
+            popover: {
+              title: '提交',
+              description: '别忘记了提交按钮还在上面',
+              position: 'left'
+            }
+          }
+        ])
+        this.startGuide()
+      }, 500)
+    },
+    startGuide () {
+      setTimeout(() => {
+        this.driver.start()
+      }, 500)
     }
   },
   computed: {
@@ -223,6 +264,23 @@ export default {
     nowQuestion () {
       for (let i = 0; i < this.questionList.length; i++) {
         if (this.questionList[i].questionId === this.form.questionId) {
+          if (this.questionList[i].example != null) {
+            let guide = window.localStorage.getItem('web-guide1')
+            // 开始引导
+            if (guide == null) {
+              guide = {
+                answer: 'true'
+              }
+              window.localStorage.setItem('web-guide1', JSON.stringify(guide))
+              this.initDriver()
+            } else if (JSON.parse(guide).answer == null) {
+              let newGuide = JSON.parse(guide)
+              newGuide['answer'] = 'true'
+              // newGuide.defineProperty('answer', 'true')
+              window.localStorage.setItem('web-guide1', JSON.stringify(newGuide))
+              this.initDriver()
+            }
+          }
           return this.questionList[i]
         }
       }
@@ -274,31 +332,6 @@ h3 {
 /* .fix-button {
 
 } */
-.code-box-container {
-  display: flex;
-  width: 80%;
-  margin: 0 auto;
-  justify-content: space-between;
-}
-
-.code-box {
-  width: 45%;
-}
-
-.item {
-  position: fixed;
-  width: 50px;
-  height: 50px;
-  font-size: 24px;
-  right: 50px;
-  bottom: 120px;
-  /* padding-top: 10px; */
-  /* padding-right: 40px; */
-}
-
-.item>>>.el-badge__content.is-fixed {
-  right: 20px;
-}
 
 /* blockquote */
 
@@ -309,6 +342,7 @@ blockquote ol {
 
 blockquote {
   border-color: #bababa;
+  text-align: justify;
 }
 
 blockquote:before,
@@ -348,16 +382,15 @@ blockquote p {
 
 /* code */
 /* =======================================*/
-.question-example-box{
+.question-example-box {
   position: relative;
-  width:100%;
+  width: 100%;
   text-align: initial;
 }
 
-.copy-btn{
+.copy-btn {
   position: absolute;
   right: 0px;
-  top:0px;
+  top: 0px;
 }
-
 </style>

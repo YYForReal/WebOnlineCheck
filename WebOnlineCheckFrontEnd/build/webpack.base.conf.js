@@ -80,7 +80,8 @@ module.exports = {
   externals: {
     'vue': 'Vue',
     // 'vue-router': 'VueRouter',
-    'ElementUI': 'ELEMENT'
+    'ElementUI': 'ELEMENT',
+    'Driver': 'Driver'
     // 'axios': 'axios',
   },
   node: {
