@@ -8,17 +8,24 @@
      -->
     <table class="comp-card">
       <tr class="table-header">
-        <td v-if="question.example !=null">JS校验代码</td>
-        <td v-else class="td-text"><a @click="dialogVisiable = true" style="text-decoration:underline;cursor:pointer">比对结果</a></td>
+        <td v-if="question.example != null" class="td-text">
+          <el-popover placement="bottom-start" title="JS代码" width="500" trigger="hover"
+            :content="filterJS(content)">
+            <span slot="reference">JS校验结果(悬浮查看代码)</span>
+          </el-popover>
+
+        </td>
+        <td v-else class="td-text"><a @click="dialogVisiable = true"
+            style="text-decoration:underline;cursor:pointer">比对结果</a></td>
         <td class="td-pic">{{ visitType === 1 ? '参考运行窗口' : '参考运行截图' }} </td>
         <td class="td-pic" @click="showBigIframe()"><a>{{ visitType === 1 ? '运行窗口(点击放大)' : '运行截图(点我放大)' }}</a></td>
       </tr>
       <tr class="table-content">
-        <td v-if="question.example !=null"> {{JSCheckResult}}</td>
-        <td v-else class="td-text" >
+        <td v-if="question.example != null" class="td-text" v-html="JSCheckResult"></td>
+        <td v-else class="td-text">
           <div ref="result" v-html="resultHtml"></div>
         </td>
-        <td  v-if="visitType === 1">
+        <td v-if="visitType === 1">
           <iframe ref="qiframe" sandbox='allow-scripts allow-same-origin'
             :src="'http://yywebsite.cn/webcheck/#/template?question=' + question.questionId"></iframe>
         </td>
@@ -28,10 +35,10 @@
             <img slot="reference" :src="comparePic" class="comp-image">
           </el-popover>
         </td>
-        <td  v-if="visitType === 1" @click="showBigIframe()">
+        <td v-if="visitType === 1" @click="showBigIframe()">
           <iframe ref="iframe" sandbox='allow-scripts allow-same-origin'></iframe>
         </td>
-        <td v-else v-loading="isLoading" >
+        <td v-else v-loading="isLoading">
           <el-popover placement="top-start" trigger="click">
             <!--trigger属性值：hover、click、focus 和 manual-->
             <img :src="runningPic" class="comp-image">
@@ -93,6 +100,20 @@ export default {
     }, 800)
   },
   methods: {
+    filterJS (str) {
+      if (str == null || str === '') return
+      // 获取script标签内的内容
+      let reg = /<script[^>]*>([^<]|<(?!\/script))*<\/script>/gmi
+      let res = str.match(reg)
+      let JSCode = ''
+      res.forEach((ele) => {
+        let startIndex = ele.indexOf('>')
+        let endIndex = ele.lastIndexOf('<')
+        ele = ele.slice(startIndex + 1, endIndex)
+        JSCode += ele
+      })
+      return JSCode
+    },
     showBigIframe () {
       this.iframeDialogVisiable = true
       setTimeout(() => {

@@ -47,14 +47,45 @@ export default {
   text-align: inherit !important;
 }
 
-/* 编辑增加按钮 */
-.fix-button{
+/* 通用动画 */
+@keyframes put-aside{
+  0% {
+    transform: scale(1);
+  }
+
+  20%{
+    transform: scale(1.5);
+  }
+
+  40%{
+    transform: scale(0.7);
+  }
+
+  60%{
+    transform: scale(1.2);
+  }
+
+  80%{
+    transform: scale(0.9);
+  }
+
+  100% {
+    right: 0px;
+    /* transform: scale(1) translateX(70px); */
+    /* background: linear-gradient(0deg, rgba(0, 3, 255, 1) 0%, rgba(2, 126, 251, 1) 100%); */
+  }
+}
+
+/* 右下角编辑增加按钮 */
+.fix-button {
   position: fixed;
-  width:70px;
-  height:70px;
-  font-size: 40px;
-  right:50px;
-  bottom:100px;
+  width: 60px;
+  height: 60px;
+  font-size: 36px;
+  right: 50px;
+  bottom: 100px;
+  z-index: 10;
+  transition: all 1s;
 }
 
 /* 代码框区域 */
@@ -100,5 +131,4 @@ export default {
   background-color: transparent;
   border: none;
 }
-
 </style>

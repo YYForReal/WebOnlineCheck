@@ -52,11 +52,12 @@
     <el-button class="fix-button" type="primary" icon="el-icon-edit" circle @click="handleAdd"></el-button>
   </el-container>
 </template>
+
 <script>
 export default {
   data () {
     return {
-      codeList: [1, 2, 3],
+      codeList: [],
       questionList: [],
       dialogFormVisible: false,
       form: {
@@ -68,7 +69,6 @@ export default {
     }
   },
   created () {
-    this.getCodeList()
     this.refreshQuestionList()
   },
   methods: {
@@ -92,6 +92,7 @@ export default {
             this.questionList.push(res.data[i])
           }
         }
+        this.getCodeList()
       }).catch((err) => {
         console.log('search question: ', err)
       })

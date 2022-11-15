@@ -73,6 +73,7 @@ export default {
     if (this.autoCompare) {
       this.picCompare()
     }
+    this.askForCheck(this.question.questionId, this.answerId)
   },
   methods: {
     formatTime (time) {

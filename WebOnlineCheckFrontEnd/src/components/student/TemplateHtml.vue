@@ -20,7 +20,7 @@ export default {
     let questionId = this.$route.query.question || this.$route.query.questionId
     if (answerId != null) {
       this.requestCheckCode(questionId).then(() => {
-        console.log('请求校验代码成功')
+        // console.log('请求校验代码成功')
         this.requestStudentCode(answerId)
       })
     } else {
@@ -37,7 +37,7 @@ export default {
           method: 'get'
         }).then((res) => {
           if (res.data.status === 200) {
-            console.log('checkCode res:', res.data.data)
+            // console.log('checkCode res:', res.data.data)
             // this.htmlText = res.data.data
             this.checkPoints = res.data.data
             resolve()
@@ -113,7 +113,7 @@ export default {
         let reg = /<script[^>]*>([^<]|<(?!\/script))*<\/script>/gmi
         let res = str.match(reg)
         let bodyDom = this.$refs.tempalteBox
-        console.log('body:', bodyDom)
+        // console.log('body:', bodyDom)
         // console.log('匹配的结果:', res)
         res.forEach((ele) => {
           let startIndex = ele.indexOf('>')
@@ -138,28 +138,57 @@ export default {
           }
         })
 
+        console.log('script before:', this.studentScript)
+        // 增加分号，防止代码运行时报错
+        this.studentScript.replaceAll('\n', ';')
+        console.log('script after:', this.studentScript)
+
         let checkLen = this.checkPoints.length
         if (checkLen > 0) {
           for (let i = 0; i < checkLen; i++) {
             this.checkPoints[i].code = this.checkPoints[i].code.replace('//StudentCode', this.studentScript)
-            console.log('Check Code :', this.checkPoints[i].code)
+            // console.log('Check Code :', this.checkPoints[i].code)
 
             setTimeout(() => {
               try {
-                // eslint-disable-next-line no-eval
-                eval(this.checkPoints[i].code)
-                // 执行成功
-                this.postResult('代码检测通过').then(() => {
-                  console.log('Post success success')
-                }).catch(() => {
-                  console.log('Post success error')
+                new Promise((resolve, reject) => {
+                  // 在执行校验脚本代码前 提供resolve、reject、this变量
+                  // eslint-disable-next-line no-unused-vars
+                  var that = this
+
+                  // eslint-disable-next-line no-eval
+                  eval(this.checkPoints[i].code)
+                }).then((value) => {
+                  // console.clear()
+                  // 执行成功
+                  this.postResult('代码检测通过<br>' + value).then(() => {
+                    console.log(' (Promise)： Post success success')
+                  }).catch(() => {
+                    console.log('(Promise)： Post success error')
+                  }, (reason) => {
+                    // 执行失败
+                    this.postResult('代码检测不通过：<br>' + reason).then(() => {
+                      console.log('(Promise)： Post error success')
+                    }).catch(() => {
+                      console.log('(Promise)： Post error error')
+                    })
+                  })
+                }).catch((e) => {
+                  // 执行失败
+                  this.postResult('执行学生JS代码出错<br>' + e).then(() => {
+                    console.log('Catch ： Post error success')
+                  }).catch(() => {
+                    console.log('Catch ： Post error error')
+                  })
                 })
               } catch (e) {
                 console.log(e)
                 // 执行失败
-                this.postResult('代码检测不通过：\n' + e).then(() => {
+                this.postResult('执行校验JS代码出错<br>' + e).then(() => {
+                  // console.clear()
                   console.log('Post error success')
                 }).catch(() => {
+                  // console.clear()
                   console.log('Post error error')
                 })
               }
