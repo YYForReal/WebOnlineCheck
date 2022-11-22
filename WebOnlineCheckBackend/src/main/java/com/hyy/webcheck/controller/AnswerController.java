@@ -1,12 +1,14 @@
 package com.hyy.webcheck.controller;
 
 import com.hyy.webcheck.bean.Answer;
+import com.hyy.webcheck.bean.StudentHtml;
 import com.hyy.webcheck.config.Result;
 import com.hyy.webcheck.service.impl.AnswerService;
 import com.hyy.webcheck.service.impl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -19,6 +21,8 @@ public class AnswerController {
 
     @Autowired
     UserService userService;
+
+
 
     //根据问题id获取对应的所有学生回答
     @GetMapping("/get")
@@ -62,8 +66,10 @@ public class AnswerController {
     }
 
     @PostMapping("/compare")
-    public Result<Float> compareAnswer(String pic1,String pic2) {
+    public Result<Float> CompareAnswer(String pic1,String pic2) {
+
         float percent = answerService.compare(answerService.getData(pic1), answerService.getData(pic2));
+
         if (percent == 0) {
             return new Result<>(500,"无法比较",0.0f);
 //            return "无法比较";
@@ -73,10 +79,29 @@ public class AnswerController {
         }
     }
 
-    @GetMapping("/search")
-    public Result<String> searchAnswer(Integer answerId){
-        return answerService.searchAnswer(answerId);
+    @PostMapping("/newcompare")
+    public Result<Float> newCompareAnswer(String pic1,String pic2) throws IOException {
+        return answerService.pyCompare(pic1,pic2);
     }
+
+//    @GetMapping("/search")
+//    public Result<String> searchAnswer(Integer answerId){
+//        return answerService.searchAnswer(answerId);
+//    }
+
+    @GetMapping("/search")
+    public Result<StudentHtml> searchAnswer(Integer answerId){
+        return answerService.searchStudentHtml(answerId);
+    }
+
+
+
+
+
+//    @GetMapping("/pyCompare")
+//    public Result<List<String>> pyCompare() throws Exception{
+//        return answerService.pyCompare();
+//    }
 
 }
 

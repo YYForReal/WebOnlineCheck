@@ -1,12 +1,10 @@
 package com.hyy.webcheck.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.hyy.webcheck.bean.QuestionWithScore;
-import com.hyy.webcheck.bean.User;
-import com.hyy.webcheck.bean.UserScore;
-import com.hyy.webcheck.bean.UserToken;
+import com.hyy.webcheck.bean.*;
+import com.hyy.webcheck.bean.User.User;
+import com.hyy.webcheck.bean.User.UserScore;
+import com.hyy.webcheck.bean.User.UserToken;
 import com.hyy.webcheck.service.AnswerDao;
 import com.hyy.webcheck.service.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +45,16 @@ public class UserService {
         return res;
     }
 
+    // 获取全部学生的提交列表
+    public CSVData getCSVData(){
+        List<User> users = userDao.getAllStudent();
+        List<Answer> answers = answerDao.getAllQuestionAnswer();
+        CSVData csvData = new CSVData();
+        csvData.setUsers(users);
+        csvData.setAnswers(answers);
+        return csvData;
+    }
+
     public UserScore getStudentScoreById(String userId,String username){
         UserScore userScore = new UserScore();
         userScore.setUserId(userId);
@@ -54,8 +62,6 @@ public class UserService {
         userScore.setAnswerList(answerDao.getAllScoreByStudent(userScore.getUserId()));
         return userScore;
     }
-
-
 
     public User getUserInfoById(String userId) {
 

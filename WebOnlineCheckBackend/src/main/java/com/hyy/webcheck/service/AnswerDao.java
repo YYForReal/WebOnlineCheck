@@ -17,6 +17,9 @@ public interface AnswerDao {
 
     List<Answer> getAllScoreByStudent(@Param("userId") String userId);
 
+    List<Answer> getAllQuestionAnswer();
+
+
     Integer judgeScore(@Param("answerId") Integer answerId, @Param("score") Integer score ,@Param("updateTime") String dateTime);
 
     Integer postAnswer(@Param("userId") String userId, @Param("questionId") Integer questionId,
@@ -30,6 +33,9 @@ public interface AnswerDao {
                        @Param("content") String content, @Param("updateTime") String dateTime);
 
     String searchAnswer(@Param("answerId") Integer answerId);
+
+    Integer searchQuestionIdByAnswerId(@Param("answerId") Integer answerId);
+
 
 
 }

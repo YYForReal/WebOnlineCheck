@@ -1,8 +1,7 @@
 package com.hyy.webcheck.service;
 
-import com.hyy.webcheck.bean.User;
-import com.hyy.webcheck.bean.UserOneScore;
-import com.hyy.webcheck.bean.UserToken;
+import com.hyy.webcheck.bean.User.User;
+import com.hyy.webcheck.bean.User.UserToken;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 

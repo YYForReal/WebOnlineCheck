@@ -2,7 +2,8 @@ package com.hyy.webcheck.controller;
 
 import com.hyy.webcheck.bean.Question;
 import com.hyy.webcheck.bean.QuestionWithScore;
-import com.hyy.webcheck.bean.UserToken;
+import com.hyy.webcheck.bean.SimpleQuestion;
+import com.hyy.webcheck.bean.User.UserToken;
 import com.hyy.webcheck.config.Result;
 import com.hyy.webcheck.service.impl.QuestionService;
 import com.hyy.webcheck.service.impl.UserService;
@@ -29,11 +30,18 @@ public class QuestionController {
     }
 
     //获取所有问题
-    @GetMapping("/getlist")
-    public List<QuestionWithScore> getQuestionInfo() {
-        List<QuestionWithScore> list = questionService.getQuestionInfo();
+    @GetMapping("/list/score")
+    public List<QuestionWithScore> getQuestionInfoWithScore() {
+        List<QuestionWithScore> list = questionService.getQuestionInfoWithScore();
         return list;
     }
+
+    @GetMapping("/getlist")
+    public List<SimpleQuestion> getQuestionInfo() {
+        List<SimpleQuestion> list = questionService.getQuestionInfo();
+        return list;
+    }
+
 
     @GetMapping("/search")
     public Result<String> searchQuestion(Integer questionId){
@@ -50,14 +58,29 @@ public class QuestionController {
 
     //上传文章
     @PostMapping("/post")
-    public Result<Boolean> postQuestion(String title, String content, String userId,String username,String html) {
-        return questionService.postQuestion(title,content,userId,username,html);
+    public Result<Boolean> postQuestion(String title, String content, String userId,
+                                        String username,String html,Integer display,
+                                        String description,String example) {
+        if(display == null)display = 0;
+        return questionService.postQuestion(title,content,userId,username,html,display,description,example);
     }
+
+//    @PostMapping("/new-post")
+//    public Result<Boolean> postQuestion1(@RequestBody Question question ) {
+//        if(question.getDisplay() == null){
+//            question.setDisplay(0);
+//        }
+//        return questionService.postQuestion(question);
+//    }
+
 
     @PostMapping("/update")
     public Result<Boolean> updateQuestion(Integer questionId, String title, String content,
-                                          String userId,String username,String html) {
-        return questionService.updateQuestion(questionId,title,content,userId,username,html);
+                                          String userId,String username,String html,
+                                          Integer display,String description,String example) {
+        if(display == null)display = 0;
+        return questionService.updateQuestion(questionId,title,content,userId,username,html,
+                display,description,example);
     }
 
     @PostMapping("/delete")

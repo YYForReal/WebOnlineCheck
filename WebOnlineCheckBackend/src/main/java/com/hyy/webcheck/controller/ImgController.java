@@ -1,7 +1,7 @@
 package com.hyy.webcheck.controller;
 
 import com.hyy.webcheck.bean.Img;
-import com.hyy.webcheck.bean.UserToken;
+import com.hyy.webcheck.bean.User.UserToken;
 import com.hyy.webcheck.config.Result;
 import com.hyy.webcheck.service.impl.ImgService;
 import com.hyy.webcheck.service.impl.UserService;

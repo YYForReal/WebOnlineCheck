@@ -54,6 +54,8 @@ public class ImgService {
         Boolean res = false;
         try{
             res = imgDao.addImg(questionId,url) > 0 ? true : false;
+            //删除Redis缓存
+            redisTemplate.delete("imgList");
             if(res){
                 message = "图片增加成功";
                 status = 200;
@@ -76,6 +78,7 @@ public class ImgService {
         Boolean res = false;
         try{
             res = imgDao.updateImg(questionId,url,imgId) > 0 ? true : false;
+            redisTemplate.delete("imgList");
             if(res){
                 message = "图片修改成功";
                 status = 200;
@@ -97,6 +100,7 @@ public class ImgService {
             return  new Result<>(500,"图片id为空",false);
         }
         if(imgDao.deleteImg(imgId)>0){
+            redisTemplate.delete("imgList");
             return new Result<>(200,"删除成功",true);
         }else{
             return new Result<>(500,"删除失败",false);

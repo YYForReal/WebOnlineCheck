@@ -1,15 +1,10 @@
 package com.hyy.webcheck.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.hyy.webcheck.bean.Answer;
-import com.hyy.webcheck.bean.Question;
-import com.hyy.webcheck.bean.QuestionWithScore;
-import com.hyy.webcheck.bean.UserToken;
+import com.hyy.webcheck.bean.*;
+import com.hyy.webcheck.bean.User.UserToken;
 import com.hyy.webcheck.config.Result;
-import com.hyy.webcheck.service.AnswerDao;
 import com.hyy.webcheck.service.QuestionDao;
-import org.jsoup.internal.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -42,7 +37,7 @@ public class QuestionService {
             str = JSONArray.toJSONString(list);
             redisTemplate.opsForValue().set("questionList", str);
             redisTemplate.expire("questionList",10,TimeUnit.MINUTES);
-            System.out.println("Save QuestionList into Redis:" + str + " --- time:" + new Date().toString());
+            System.out.println("Save QuestionList into Redis. time: " + new Date().toString());
         }else {
             //从Redis拿
             list = JSONArray.parseArray(str,Question.class);
@@ -50,8 +45,8 @@ public class QuestionService {
         return list;
     }
 
-    public List<QuestionWithScore> getQuestionInfo() {
-        List<QuestionWithScore> list ;
+    public List<SimpleQuestion> getQuestionInfo() {
+        List<SimpleQuestion> list ;
         String str = redisTemplate.opsForValue().get("questionInfoList");
         if(str == null){
             // 从数据库拿，放Redis里面
@@ -59,14 +54,31 @@ public class QuestionService {
             str = JSONArray.toJSONString(list);
             redisTemplate.opsForValue().set("questionInfoList", str);
             redisTemplate.expire("questionInfoList",1,TimeUnit.HOURS);
-            System.out.println("Save QuestionInfoList into Redis:" + str + " --- time:" + new Date().toString());
+            System.out.println("Save QuestionInfoList into Redis: --- time:" + new Date().toString());
+        }else {
+            //从Redis拿
+            list = JSONArray.parseArray(str,SimpleQuestion.class);
+        }
+        return list;
+    }
+
+
+    public List<QuestionWithScore> getQuestionInfoWithScore() {
+        List<QuestionWithScore> list ;
+        String str = redisTemplate.opsForValue().get("questionInfoList");
+        if(str == null){
+            // 从数据库拿，放Redis里面
+            list = questionDao.getQuestionInfoWithScore();
+            str = JSONArray.toJSONString(list);
+            redisTemplate.opsForValue().set("questionInfoList", str);
+            redisTemplate.expire("questionInfoList",1,TimeUnit.HOURS);
+            System.out.println("Save QuestionInfoList into Redis: --- time:" + new Date().toString());
         }else {
             //从Redis拿
             list = JSONArray.parseArray(str,QuestionWithScore.class);
         }
         return list;
     }
-
 
     public Result<String> searchQuestion(Integer questionId){
         String ans = questionDao.searchQuestion(questionId);
@@ -78,7 +90,9 @@ public class QuestionService {
     }
 
     public Result<Boolean> postQuestion(String title, String content,
-                                        String userId,String username,String html) {
+                                        String userId,String username,
+                                        String html,Integer display,
+                                        String description,String example) {
 
         UserToken userToken =  userService.checkUserToken(userId,username);
         if(userToken == null){
@@ -91,13 +105,44 @@ public class QuestionService {
             String dateTime = df.format(date); // Formats a Date into a date/time string.
             System.out.println("提交问题：用户ID："+userId + " -- 问题标题："+ title + "-- 时间："+dateTime);
 
-            if (questionDao.postQuestion(title, content,userId,  dateTime,html) == 1) {
+            //删除Redis缓存
+            redisTemplate.delete("questionList");
+            redisTemplate.delete("questionInfoList");
+
+            if (questionDao.postQuestion(title, content,userId,  dateTime,html,display,description,example) == 1) {
                 return new Result<>(200,"问题提交成功",true);
             }
             return new Result<>(500,"问题提交失败",false);
         }
 
     }
+
+//    public Result<Boolean> postQuestion(Question question) {
+//        UserToken userToken =  userService.checkUserToken(question.getUserId(),question.getUsername());
+//        if(userToken == null){
+//            return new Result<>(500,"账号不存在",false);
+//        }else if(userToken.getType() == 0){
+//            return new Result<>(500,"权限不足",false);
+//        }else{
+//            Date date = new Date();
+//            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+//            String dateTime = df.format(date); // Formats a Date into a date/time string.
+//            System.out.println("提交问题：用户ID："+question.getUserId() + " -- 问题标题："+ question.getTitle() + "-- 时间："+dateTime);
+//
+//            //删除Redis缓存
+//            redisTemplate.delete("questionList");
+//            redisTemplate.delete("questionInfoList");
+//
+//            if (questionDao.postQuestion(question.getTitle(), question.getContent(),
+//                    question.getUserId(),  dateTime, question.getHtml(), question.getDisplay(),
+//                    question.getDescription(), question.getExample()) == 1) {
+//                return new Result<>(200,"问题提交成功",true);
+//            }
+//            return new Result<>(500,"问题提交失败",false);
+//        }
+//
+//    }
+
 
     public Result<List<QuestionWithScore>> getAllQuestionScore(){
         List<QuestionWithScore> list = new ArrayList<>();
@@ -115,18 +160,24 @@ public class QuestionService {
         return new Result<>(200, "获取分数成功", list);
     }
 
-    public Result<Boolean> updateQuestion(Integer questionId, String title,String content,String userId,String username,String html){
+    public Result<Boolean> updateQuestion(Integer questionId, String title,String content,
+                                          String userId,String username,String html,Integer display,
+                                          String description,String example){
         UserToken userToken =  userService.checkUserToken(userId,username);
         if(userToken == null){
             return new Result<>(500,"账号不存在",false);
         }else if(userToken.getType() == 0){
             return new Result<>(500,"权限不足",false);
         }else{
+            //删除Redis缓存
+            redisTemplate.delete("questionList");
+            redisTemplate.delete("questionInfoList");
+
             Date date = new Date();
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
             String dateTime = df.format(date); // Formats a Date into a date/time string.
             System.out.println("更新问题：用户ID："+userId + " -- 问题标题："+ title + "-- 时间："+dateTime);
-            if(questionDao.updateQuestion(questionId,title,content,userId,dateTime,html)>0){
+            if(questionDao.updateQuestion(questionId,title,content,userId,dateTime,html,display,description,example)>0){
                 return new Result<>(200,"更新成功",true);
             }else{
                 return new Result<>(500,"更新失败",false);
@@ -137,6 +188,9 @@ public class QuestionService {
 
     public Result<Boolean> deleteQuestion(int questionId){
         if(questionDao.deleteQuestion(questionId)>0){
+            //删除Redis缓存
+            redisTemplate.delete("questionList");
+            redisTemplate.delete("questionInfoList");
             return new Result<>(200,"删除成功",true);
         }else{
             return new Result<>(500,"删除失败",false);

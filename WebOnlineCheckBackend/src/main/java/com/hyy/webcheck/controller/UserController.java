@@ -1,8 +1,9 @@
 package com.hyy.webcheck.controller;
 
-import com.hyy.webcheck.bean.User;
-import com.hyy.webcheck.bean.UserScore;
-import com.hyy.webcheck.bean.UserToken;
+import com.hyy.webcheck.bean.*;
+import com.hyy.webcheck.bean.User.User;
+import com.hyy.webcheck.bean.User.UserScore;
+import com.hyy.webcheck.bean.User.UserToken;
 import com.hyy.webcheck.config.Result;
 import com.hyy.webcheck.service.impl.UserService;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +35,14 @@ public class UserController {
         Result<List<UserScore>> res = new Result<>(200,"查询成功",userService.getAllStudentScore());
         return res;
     }
+
+    // 获取全部学生的提交列表
+    @GetMapping("/get/submit-list")
+    public Result<CSVData> getAllStudentSubmitList () {
+        Result<CSVData> res = new Result<>(200,"查询成功",userService.getCSVData());
+        return res;
+    }
+
 
     // 获取单个学生的成绩
     @GetMapping ("/get/score")

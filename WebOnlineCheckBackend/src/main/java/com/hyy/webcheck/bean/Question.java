@@ -1,6 +1,7 @@
 package com.hyy.webcheck.bean;
 
 import lombok.Data;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 
@@ -20,8 +21,14 @@ public class Question {
 
     private Date updateTime;//文章最后一次更新时间
 
-    private String img;//图片效果
+//    private String img;//图片效果
 
     private String html;// 比对的html内容
+
+    private Integer display;//展示的方式 null、0默认图片，1为iframe
+
+    private String description;//实验的说明性文字
+
+    private String example;//模板HTML
 
 }
