@@ -44,7 +44,7 @@
               <p v-if="tip.errorCode">冲突代码</p>
               <pre v-if="tip.errorCode"><code>{{tip.errorCode}}</code></pre>
             </div>
-            <div class="code-box">
+            <div class="code-box" >
               <p v-if="tip.rightCode">有效代码</p>
               <pre v-if="tip.rightCode"><code>{{tip.rightCode}}</code></pre>
               <!-- <el-input type="textarea" disabled rows="8" v-if="tip.rightCode" v-model="tip.rightCode"></el-input> -->
@@ -66,14 +66,14 @@
           <h2>{{ tip.title }}</h2>
           <p v-html="tip.content"></p>
           <div class="code-box-container">
-            <div class="code-box">
-              <p v-if="tip.errorCode">冲突代码</p>
-              <pre v-if="tip.errorCode"><code>{{tip.errorCode}}</code></pre>
+            <div v-if="tip.errorCode" class="code-box" :class="{'code-full-box':!tip.rightCode}">
+              <p >冲突代码</p>
+              <pre><code>{{tip.errorCode}}</code></pre>
               <!-- <el-input type="textarea" disabled rows="8" v-if="tip.errorCode" v-model="tip.errorCode"></el-input> -->
             </div>
-            <div class="code-box">
-              <p v-if="tip.rightCode">有效代码</p>
-              <pre v-if="tip.rightCode"><code>{{tip.rightCode}}</code></pre>
+            <div v-if="tip.rightCode" class="code-box" :class="{'code-full-box':!tip.errorCode}">
+              <p >有效代码</p>
+              <pre ><code>{{tip.rightCode}}</code></pre>
               <!-- <el-input type="textarea" disabled rows="8" v-if="tip.rightCode" v-model="tip.rightCode"></el-input> -->
             </div>
           </div>
@@ -119,27 +119,28 @@ export default {
       dialogVisibleJS: false,
       dialogJSTips: [
         {
+          title: '绑定DOM事件（一）',
+          content: '给DOM绑定事件时：推荐直接在JS中增加事件监听器。<br>',
+          rightCode: '// 方式1\ndom.addEventListener("click",function(){...})\n// 方式2\ndom.onclick = function(){...} \n'
+        },
+        {
+          title: '绑定DOM事件（二）',
+          content: '给DOM绑定事件时：不推荐：在HTML标签上声明onclick。<br>如果采取该方式，需要<b>额外将函数xxx手动挂载到window对象上</b>。 ',
+          errorCode: '<button onclick="xxx"></button>',
+          rightCode: '// 方式3\n<button onclick = "xxx()"></button>\nJS部分:\nfunction xxx(){...}\nwindow.xxx = xxx;\n'
+        },
+        {
           title: '变量声明',
           content: '网站提交的代码中，JS变量需声明（var、let、const），若不声明而直接使用，本地虽然可以，但网站会报错。',
           errorCode: 'count = 1 ;\nfor(i=0;i<10;i++){\n\t...\n}',
           rightCode: 'var count = 1 ; \nfor(var i=0;i<10;i++){\n\t...\n}'
         },
         {
-          title: '使用document.write务必不要增加HTML标签',
-          content: '不同于本地直接调用script。网站检查将<b>异步</b>调用代码：使用document.write()会覆盖原有的DOM结构。<br>具体原因可见：<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Document/write" target="_blank">https://developer.mozilla.org/zh-CN/docs/Web/API/Document/write</a>'
-        },
-        {
-          title: '对HTML结构的操作',
-          content: '不可使用document.write方法，需通过document.getElementByXXX等方法操作DOM对象进行内容修改。'
+          title: '增加分号',
+          content: '网站提交的代码中，JS语句需增加分号，若不增加，本地虽然可以，但网站<b>可能</b>会报错。（<b>在代码不换行的情况下</b>）',
+          errorCode: 'var count = 1 \ncount ++',
+          rightCode: 'var count = 1 ; \ncount ++;'
         }
-
-        // {
-        //   title: '增加分号',
-        //   content: '网站提交的代码中，JS语句需增加分号，若不增加，本地虽然可以，但网站可能会报错。',
-        //   errorCode: 'var count = 1 \ncount ++',
-        //   rightCode: 'var count = 1 ; \ncount ++;'
-        // }
-
       ]
     }
   },
@@ -252,6 +253,11 @@ export default {
 
 .code-box {
   width: 45%;
+}
+
+.code-full-box{
+  width:90%;
+  margin: 0 auto;
 }
 
 .item,

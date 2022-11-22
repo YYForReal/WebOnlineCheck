@@ -21,6 +21,7 @@ div<template>
         </el-form-item>
         <el-button type="info" round @click="compareSettingVisible = true">截图配置</el-button>
         <el-button type="primary" icon="el-icon-search" round @click="refreshAnswerList">搜索</el-button>
+        <el-button type="primary" round @click="refreshCSVData">导出提交列表</el-button>
       </el-form>
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage"
         :page-sizes="pageSizes" :page-size="PageSize" layout="total, sizes, prev, pager, next, jumper"
@@ -116,8 +117,10 @@ export default {
       // 个数选择器（可修改）
       pageSizes: [10, 20, 30, 40, 50, 60, 80, 100],
       // 默认每页显示的条数（可修改）
-      PageSize: 10
+      PageSize: 10,
 
+      // 导出数据
+      csvData: null
     }
   },
   created () {
@@ -130,6 +133,61 @@ export default {
     }, 500)
   },
   methods: {
+    refreshCSVData () {
+      this.axios({
+        url: this.baseUrl + '/user/get/submit-list',
+        method: 'get'
+      }).then((res) => {
+        this.csvData = res.data.data
+        // this.canAskQuestionPic = true
+        // console.log('csv数据列表：', this.csvData)
+        this.exportCSV()
+        // this.askPictureUrl()
+      }).catch((err) => {
+        console.log('request /question/get: ', err)
+      })
+    },
+    exportCSV () {
+      const titleArr = ['学号', '姓名']
+      const excelArray = []
+      let hashMap = new Map()
+      // 导入 标题
+      for (let i = 0; i < this.questionList.length; i++) {
+        hashMap.set(this.questionList[i].questionId, i + 2)
+        titleArr.push(this.questionList[i].title)
+      }
+      excelArray.push(titleArr)
+
+      // 导入学生数据
+      let userIndex = 0
+      for (let i = 0; i < this.csvData.users.length; i++) {
+        let rowArr = new Array(this.questionList.length).fill(0)
+        let userId = this.csvData.users[i].userId
+        rowArr.unshift(this.csvData.users[i].userName)
+        rowArr.unshift(userId)
+        // console.log(rowArr)
+        while (userIndex < this.csvData.answers.length) {
+          if (this.csvData.answers[userIndex].userId > userId) {
+            break
+          } else {
+            rowArr[hashMap.get(this.csvData.answers[userIndex].questionId)] = 1
+          }
+          userIndex++
+        }
+        excelArray.push(rowArr)
+      }
+      // console.log('excelData:', excelArray)
+
+      const excelData = excelArray.map(data => data.join(',')).join('\r\n')
+      // console.log(excelData)
+      const CsvString = 'data:application/vnd.ms-excel;charset=utf-8,\uFEFF' + encodeURIComponent(excelData)
+      var x = document.createElement('A')
+      x.setAttribute('href', CsvString)
+      x.setAttribute('download', 'data.csv')
+      document.body.appendChild(x)
+      x.click()
+      document.body.removeChild(x)
+    },
     // 可以比对的图像数量
     completeCompare () {
       this.canCompareNumber++
@@ -326,7 +384,7 @@ export default {
       }).then((res) => {
         this.questionList = res.data
         this.canAskQuestionPic = true
-        console.log('问题列表：', this.questionList)
+        // console.log('问题列表：', this.questionList)
         // this.askPictureUrl()
       }).catch((err) => {
         console.log('request /question/get: ', err)
@@ -416,7 +474,6 @@ export default {
   },
   components: {
     JudgeVue
-
   },
   computed: {
     showAnswerList () {
@@ -431,6 +488,7 @@ export default {
         }
         return idFlag && nameFlag
       })
+      // console.log('排序：', resList)
       resList.sort((a, b) => {
         if (a.questionId !== b.questionId) {
           return a.questionId - b.questionId

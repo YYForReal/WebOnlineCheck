@@ -19,10 +19,10 @@ export default {
     let answerId = this.$route.query.answer || this.$route.query.answerId
     let questionId = this.$route.query.question || this.$route.query.questionId
     if (answerId != null) {
-      this.requestCheckCode(questionId).then(() => {
-        // console.log('请求校验代码成功')
-        this.requestStudentCode(answerId)
-      })
+      this.requestStudentCode(answerId)
+      // this.requestCheckCode(questionId).then(() => {
+      //   this.requestStudentCode(answerId)
+      // })
     } else {
       this.isQuestion = true
       console.log('这是问题ID:', questionId)
@@ -30,34 +30,35 @@ export default {
     }
   },
   methods: {
-    requestCheckCode (questionId) {
-      return new Promise((resolve, reject) => {
-        this.axios({
-          url: this.baseUrl + '/code/get?questionId=' + questionId,
-          method: 'get'
-        }).then((res) => {
-          if (res.data.status === 200) {
-            // console.log('checkCode res:', res.data.data)
-            // this.htmlText = res.data.data
-            this.checkPoints = res.data.data
-            resolve()
-          } else {
-            console.log(res.data.message)
-            reject(res.data.message)
-          }
-        }).catch((err) => {
-          console.log('search answer: ', err)
-          reject(err)
-        })
-      })
-    },
+    // requestCheckCode (questionId) {
+    //   return new Promise((resolve, reject) => {
+    //     this.axios({
+    //       url: this.baseUrl + '/code/get?questionId=' + questionId,
+    //       method: 'get'
+    //     }).then((res) => {
+    //       if (res.data.status === 200) {
+    //         // console.log('checkCode res:', res.data.data)
+    //         // this.htmlText = res.data.data
+    //         this.checkPoints = res.data.data
+    //         resolve()
+    //       } else {
+    //         console.log(res.data.message)
+    //         reject(res.data.message)
+    //       }
+    //     }).catch((err) => {
+    //       console.log('校验代码请求失败: ', err)
+    //       reject(err)
+    //     })
+    //   })
+    // },
     requestStudentCode (answerId) {
       this.axios({
         url: this.baseUrl + '/answer/search?answerId=' + answerId,
         method: 'get'
       }).then((res) => {
         if (res.data.status === 200) {
-          this.htmlText = res.data.data
+          this.checkPoints = res.data.data.codes
+          this.htmlText = res.data.data.content
         } else {
           console.log(res.data.message)
         }
@@ -115,34 +116,35 @@ export default {
         let bodyDom = this.$refs.tempalteBox
         // console.log('body:', bodyDom)
         // console.log('匹配的结果:', res)
-        res.forEach((ele) => {
-          let startIndex = ele.indexOf('>')
-          let endIndex = ele.lastIndexOf('<')
-          ele = ele.slice(startIndex + 1, endIndex)
-          // console.log(ele)
+        // 如果具有script标签
+        if (res != null) {
+          res.forEach((ele) => {
+            let startIndex = ele.indexOf('>')
+            let endIndex = ele.lastIndexOf('<')
+            ele = ele.slice(startIndex + 1, endIndex)
+            // console.log(ele)
 
-          this.studentScript += ele
-          // 如果是问题的参考代码，则直接加入script，无需校验
-          if (this.isQuestion === true) {
-            let scriptDom = document.createElement('script')
-            scriptDom.type = 'text/javascript'
-            scriptDom.text = ele
-            console.log('scriptDom:', scriptDom)
-            setTimeout(() => {
-              try {
-                bodyDom.appendChild(scriptDom)
-              } catch (e) {
-                console.log('JS代码报错:', e)
-              }
-            }, 100)
-          }
-        })
+            this.studentScript += ele
+            // 如果是问题的参考代码 || 没有校验代码，则直接加入script，无需校验
+            if (this.isQuestion === true || this.checkPoints.length === 0) {
+              let scriptDom = document.createElement('script')
+              scriptDom.type = 'text/javascript'
+              scriptDom.text = ele
+              console.log('scriptDom:', scriptDom)
+              setTimeout(() => {
+                try {
+                  bodyDom.appendChild(scriptDom)
+                } catch (e) {
+                  console.log('JS代码报错:', e)
+                }
+              }, 100)
+            }
+          })
+        }
 
-        console.log('script before:', this.studentScript)
         // 增加分号，防止代码运行时报错
-        this.studentScript.replaceAll('\n', ';')
-        console.log('script after:', this.studentScript)
-
+        // this.studentScript.replaceAll('\n', ';')
+        this.studentScript.replace(/\n/g, ';')
         let checkLen = this.checkPoints.length
         if (checkLen > 0) {
           for (let i = 0; i < checkLen; i++) {
@@ -163,21 +165,45 @@ export default {
                   // 执行成功
                   this.postResult('代码检测通过<br>' + value).then(() => {
                     console.log(' (Promise)： Post success success')
+                    this.$message({
+                      type: 'success',
+                      message: '代码校验完成'
+                    })
                   }).catch(() => {
                     console.log('(Promise)： Post success error')
+                    this.$message({
+                      type: 'error',
+                      message: '代码校验失败'
+                    })
                   }, (reason) => {
                     // 执行失败
                     this.postResult('代码检测不通过：<br>' + reason).then(() => {
                       console.log('(Promise)： Post error success')
+                      this.$message({
+                        type: 'success',
+                        message: '代码校验完成'
+                      })
                     }).catch(() => {
                       console.log('(Promise)： Post error error')
+                      this.$message({
+                        type: 'error',
+                        message: '代码校验失败'
+                      })
                     })
                   })
                 }).catch((e) => {
                   // 执行失败
-                  this.postResult('执行学生JS代码出错<br>' + e).then(() => {
+                  this.postResult('校验学生JS代码异常：<br>' + e).then(() => {
+                    this.$message({
+                      type: 'success',
+                      message: '代码校验完成'
+                    })
                     console.log('Catch ： Post error success')
                   }).catch(() => {
+                    this.$message({
+                      type: 'error',
+                      message: '代码校验失败'
+                    })
                     console.log('Catch ： Post error error')
                   })
                 })

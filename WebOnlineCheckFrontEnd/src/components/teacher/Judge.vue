@@ -110,12 +110,19 @@ export default {
     picCompare () {
       this.isLoading = true
       this.isLoading2 = true
-      // let pageUrl = 'http://yywebsite.cn/'
+
+      // bug | TODO: 注意这里第二个参数后的question会被切为表单的另外一项
       let pageUrl = 'http://yywebsite.cn/webcheck/#/template' + '?answer=' + this.answerId + '&question=' + this.question.questionId
       let width = this.compareSetting.width
       let height = this.compareSetting.height
-      let timeout = 40000
+      let timeout = 35000
       let delay = this.compareSetting.delay
+      // let sendData = new FormData()
+      // sendData.append('pageUrl', pageUrl)
+      // sendData.append('width', width)
+      // sendData.append('height', height)
+      // sendData.append('timeout', timeout)
+      // sendData.append('delay', delay)
       this.axios(
         {
           method: 'POST',

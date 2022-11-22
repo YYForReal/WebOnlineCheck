@@ -97,6 +97,7 @@ export default {
   overflow: auto;
   padding: 1em;
   background: hsl(0, 0%, 8%);
+  max-height: 560px;
 }
 
 .code-box pre,

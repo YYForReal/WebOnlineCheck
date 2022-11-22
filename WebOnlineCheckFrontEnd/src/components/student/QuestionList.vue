@@ -4,7 +4,7 @@
     <h4>说明</h4>
     <ol>
       <li>提交前注意将img的引用地址从本地地址改为线上链接。</li>
-      <li>提交后需重返本页查看对应实验的预览效果。</li>
+      <li>提交后需重返本页查看对应实验的校验结果。</li>
     </ol>
     <el-collapse class="submit-list" v-model="activeNames" accordion>
       <el-collapse-item v-for="answer in scoreList" :key="answer.answerId" :title="answer.questionTitle"
