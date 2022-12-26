@@ -192,6 +192,7 @@ export default {
             message: '提交成功',
             showClose: true
           })
+          // window.open(url, '_blank')
         } else {
           this.$message({
             type: 'error',
