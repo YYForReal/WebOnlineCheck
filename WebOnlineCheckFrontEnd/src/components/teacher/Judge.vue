@@ -6,6 +6,12 @@
     </div>
     <div class="student-info-box">
       <el-form :inline="true" :model="formInline">
+        <el-form-item label="分数"  >
+          <el-input :id="'score-dom-'+answerId"  ref="scoreDom" v-model="formInline.newScore" type="number" @keyup.enter.native="onSubmit" autoComplete ></el-input>
+        </el-form-item>
+        <!-- <el-form-item>
+          <el-button type="primary" @click="onSubmit">评分</el-button>
+        </el-form-item> -->
         <el-form-item label="学号">
           <!-- <span class="form-span" >{{userId}}</span> -->
 
@@ -17,8 +23,8 @@
         </el-form-item>
         <!-- <el-form-item label="原分数">
           <el-input v-model="score" disabled="disabled"></el-input>
-        </el-form-item>
-         -->
+        </el-form-item> -->
+
         <el-form-item label="相似度:">
           <!-- <span class="form-span"  v-loading="!similarity">{{similarity}}</span> -->
           <!-- similarity -->
@@ -33,16 +39,11 @@
         </el-form-item>
         <p class="form-span">{{ formatTime(updateTime) }}</p>
 
-        <!-- <el-form-item label="分数">
-          <el-input v-model="formInline.newScore" type="number"></el-input>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="onSubmit">评分</el-button>
-        </el-form-item> -->
       </el-form>
     </div>
     <CompareCard :visitType="question.display == 1 ? 1 : 0" :content="content" :questionText="question.content"
-      :comparePic="basePicUrl2" :runningPic="basePicUrl" :isLoading="isLoading" :question="question" :JSCheckResult="JSCheckResult" />
+      :comparePic="basePicUrl2" :runningPic="basePicUrl" :isLoading="isLoading" :question="question"
+      :JSCheckResult="JSCheckResult" ref="compCard"  />
   </el-card>
 </template>
 
@@ -73,14 +74,21 @@ export default {
     if (this.autoCompare) {
       this.picCompare()
     }
-    this.askForCheck(this.question.questionId, this.answerId)
+    if (this.question.example != null) {
+      this.askForCheck(this.question.questionId, this.answerId)
+    }
+    if (this.score != null) {
+      this.formInline.newScore = this.score
+    }
   },
   methods: {
     formatTime (time) {
       return MyFilter.dateFormat(time)
     },
     viewEffect () {
-      let url = 'http://yywebsite.cn/webcheck/#/template'
+      // let url = 'http://yywebsite.cn/webcheck/#/template'
+      let url = 'http://localhost:8080/#/template'
+
       let answerStr = '?answer=' + this.answerId
       let questionStr = '&question=' + this.question.questionId
 
@@ -103,26 +111,73 @@ export default {
         // })
         this.similarity = res.data.data * 100
         this.isLoading2 = false
+
+        this.saveCache(this.answerId, pic1, this.similarity)
       }).catch((err) => {
-        console.log('request /answer/compare: ', err)
+        console.log('request /answer/newcompare: ', err)
+        this.isLoading2 = false
+      })
+    },
+    saveCache (answerId, baseStr, similarity) {
+      this.axios({
+        url: this.baseUrl + '/img/answer/post',
+        method: 'post',
+        transformRequest: [(data) => {
+          var oMyForm = new FormData()
+          oMyForm.append('answerId', answerId)
+          oMyForm.append('baseStr', baseStr)
+          oMyForm.append('similarity', similarity)
+          return oMyForm
+        }]
+      }).then((res) => {
+        console.log(answerId + ' 缓存 ' + res.data.message)
+      }).catch((err) => {
+        console.log('request /answer/newcompare: ', err)
+        this.isLoading2 = false
       })
     },
     picCompare () {
       this.isLoading = true
       this.isLoading2 = true
+      if (this.autoCache) {
+        this.axios.get(this.baseUrl + '/img/answer/get?answerId=' + this.answerId)
+          .then(res => {
+            if (res.status === 200 && res.data.status === 200) {
+              this.isLoading = false
+              this.$emit('completeCompare')
+              let imgCache = res.data.data
+              console.log('imgCache:', imgCache)
+              let nowTime = new Date()
+              console.log('nowTime:', nowTime)
 
-      // bug | TODO: 注意这里第二个参数后的question会被切为表单的另外一项
+              if (imgCache != null) {
+                this.basePicUrl = imgCache.baseStr
+                this.similarity = imgCache.similarity
+                this.isLoading = false
+                this.isLoading2 = false
+                console.log(nowTime < imgCache.date)
+                // this.askForSimilarity(this.basePicUrl, this.basePicUrl2)
+                // if (this.question.example != null) {
+                //   this.askForCheck(this.question.questionId, this.answerId)
+                // }
+              } else {
+                this.askForNewPic()
+              }
+            }
+          })
+      } else {
+        this.askForNewPic()
+      }
+    },
+    askForNewPic () {
+      // 请求获取新图片
+      // bug : 注意这里第二个参数后的question会被切为表单的另外一项
+      // 当前解决方案：依旧只传入一个参数，让目的Url通过该参数请求重新获取questionid
       let pageUrl = 'http://yywebsite.cn/webcheck/#/template' + '?answer=' + this.answerId + '&question=' + this.question.questionId
       let width = this.compareSetting.width
       let height = this.compareSetting.height
-      let timeout = 35000
+      let timeout = 50000
       let delay = this.compareSetting.delay
-      // let sendData = new FormData()
-      // sendData.append('pageUrl', pageUrl)
-      // sendData.append('width', width)
-      // sendData.append('height', height)
-      // sendData.append('timeout', timeout)
-      // sendData.append('delay', delay)
       this.axios(
         {
           method: 'POST',
@@ -141,8 +196,11 @@ export default {
           // 获取问题的base转码
           // this.basePicUrl2 = this.$emit('getQuestionBase')
           // console.log('答案的base转码为:', this.basePicUrl2)
+
           this.askForSimilarity(this.basePicUrl, this.basePicUrl2)
-          this.askForCheck(this.question.questionId, this.answerId)
+          if (this.question.example != null) {
+            this.askForCheck(this.question.questionId, this.answerId)
+          }
         } else {
           console.log(res.data.message)
         }
@@ -156,6 +214,7 @@ export default {
         })
       })
     },
+
     onSubmit () {
       if (this.account == null) {
         this.$message({
@@ -237,16 +296,9 @@ export default {
       })
     },
     askForCheck (questionId, answerId) {
-      console.log('askForCheck:', questionId, answerId)
       return this.axios({
         url: this.baseUrl + '/code/result/get?questionId=' + questionId + '&answerId=' + answerId,
         method: 'get'
-        // transformRequest: [(data) => {
-        //   var oMyForm = new FormData()
-        //   oMyForm.append('questionId', questionId)
-        //   oMyForm.append('answerId', answerId)
-        //   return oMyForm
-        // }]
       }).then((res) => {
         if (res.data.status === 400) {
           this.JSCheckResult = res.data.message
@@ -306,6 +358,10 @@ export default {
       type: Boolean,
       default: false
     },
+    autoCache: {
+      type: Boolean,
+      default: true
+    },
     updateTime: {
       type: String,
       default: ''
@@ -319,21 +375,28 @@ export default {
           delay: 1000
         }
       }
+    },
+    focusDom: {
+      type: Boolean,
+      default: false
     }
   },
   watch: {
     answerId: function () { },
     content: function () { },
     score: function (val) {
+      if (val.indexOf('+') !== -1 || val.indexOf('-') !== -1) {
+        val.length = val.length - 1
+      }
       this.newScore = val
     },
     autoCompare: function (val) {
-      // console.log('change SOn')
       if (val === true) {
         console.log('auto')
         this.picCompare()
       }
     },
+    autoCache: function () { },
     active: function (val) {
       // console.log('change', this.$refs.star.style)
       // let str = this.questionTitle
@@ -350,6 +413,21 @@ export default {
         this.$refs.star.style.width = (width1 * 16 + width2 * 11) + 'px'
       } else {
         this.$refs.star.style.width = '40px'
+      }
+    },
+    focusDom: function (val) {
+      console.log('focus')
+
+      if (val === true) {
+        document.querySelector('#score-dom-' + this.answerId).scrollIntoView({behavior: 'smooth', block: 'start', inline: 'nearest'})
+        setTimeout(() => {
+          document.querySelector('#score-dom-' + this.answerId).focus()
+        }, 600)
+        // setTimeout(() => {
+        //   this.$refs.scoreDom.focus()
+        // }, 100)
+
+        // this.$refs.scoreDom.scrollIntoView()
       }
     }
   },
@@ -402,6 +480,10 @@ export default {
   padding-left: 20px;
   transition: all 1s;
 
+}
+
+.judge-card >>> .el-form-item .el-form-item__content{
+  max-width:130px;
 }
 
 .judge-card .active-star {

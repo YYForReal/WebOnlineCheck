@@ -9,6 +9,7 @@
 export default {
   name: 'App',
   mounted () {
+    // eslint-disable-next-line no-unused-vars
     const author = `
                           _    _                     _    _ __     ____     __
              /\\          | |  | |                 _ | |  | |\\ \\   / /\\ \\   / /
@@ -17,7 +18,7 @@ export default {
           / ____ \\| |_| || |_ | | | || (_) || |   _ | |  | |   | |      | |
          /_/    \\_\\\\__,_| \\__||_| |_| \\___/ |_|  (_)|_|  |_|   |_|      |_|`
 
-    console.log(author)
+    // console.log(author)
   }
 }
 </script>
@@ -45,6 +46,8 @@ export default {
   position: inherit;
   color: inherit !important;
   text-align: inherit !important;
+  /* 一键哀悼 */
+  /* filter: grayscale(100%); */
 }
 
 /* 通用动画 */

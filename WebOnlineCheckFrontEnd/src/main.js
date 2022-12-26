@@ -13,6 +13,9 @@ import axios from 'axios'
 
 // Vue.prototype.$md5 = md5
 Vue.prototype.axios = axios
+/**
+ * 在Home.vue中还有一个外链的API接口，用于防小偷
+ */
 // Vue.prototype.baseUrl = 'http://localhost:5520'
 Vue.prototype.baseUrl = 'http://118.31.165.150:5520'
 Vue.config.productionTip = false
