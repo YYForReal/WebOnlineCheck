@@ -3,8 +3,12 @@
     <h2>已提交列表</h2>
     <h4>说明</h4>
     <ol>
-      <li>提交前注意将img的引用地址从本地地址改为线上链接。</li>
-      <li>提交后需重返本页查看对应实验的校验结果。</li>
+      <li>提交实验代码需确保页面在点击提交等按钮后不会出现页面跳转或刷新的情况。</li>
+      <!-- <li>提交前注意将img的引用地址从本地地址改为线上链接。</li> -->
+      <!-- <li v-if="hiddenFlag == false" >提交列表中将于{{targetDate.getDate()+'日'+targetDate.getHours()+'时'}}去除下方<span style="color:blueviolet">提交内容</span>的代码查看，各位记得保存好一份本地代码~</li>
+      <li v-else >提交列表已去除<span style="color:blueviolet">提交内容</span>的查看，各位记得保存好一份本地代码~</li>
+      <li v-if="hiddenFlag == false" >去除剩余时间：{{releaseTime}}</li>
+      <li>本周更新了用户登录、随机数、通讯录的校验代码，如果出现无法检测DOM及函数的情况会出现警告。</li> -->
     </ol>
     <el-collapse class="submit-list" v-model="activeNames" accordion>
       <el-collapse-item v-for="answer in scoreList" :key="answer.answerId" :title="answer.questionTitle"
@@ -29,8 +33,8 @@
         </el-form>
 
         <!-- v-if="answer.compareText == null" -->
-        <div>
-          <el-form>
+        <div v-if="hiddenFlag == false">
+          <el-form >
             <el-form-item label="提交内容">
               <el-input type="textarea" v-text="answer.content" disabled></el-input>
             </el-form-item>
@@ -52,7 +56,10 @@ export default {
   data () {
     return {
       activeNames: ['1'],
-      scoreList: []
+      scoreList: [],
+      hiddenFlag: true,
+      targetDate: new Date('2022/11/29 17:00:00'),
+      releaseTime: null
     }
   },
   components: {
@@ -64,7 +71,45 @@ export default {
     }
   },
   mounted () {
-    console.log('QuestionLisr mounted')
+    let now = new Date()
+    let target = this.targetDate
+    if (now > target) {
+      this.hiddenFlag = true
+    } else {
+      this.hiddenFlag = false
+      let now = new Date()
+      if (now > target) {
+        this.hiddenFlag = true
+      } else {
+        this.releaseTime = parseInt((this.targetDate - now) / 1000)
+        let time = this.releaseTime
+        let days = parseInt(time / 3600 / 24)
+        let hours = parseInt(time / 3600) % 24
+        let seconds = parseInt(time % 60)
+        let minutes = parseInt(time / 60) % 60
+
+        this.releaseTime = days + ' 天 ' + hours + ' 时 ' + minutes + ' 分 ' + seconds + ' 秒 '
+      }
+      let timer = setInterval(() => {
+        let now = new Date()
+        if (now > target) {
+          this.hiddenFlag = true
+          clearInterval(timer)
+        } else {
+          this.releaseTime = parseInt((this.targetDate - now) / 1000)
+          let time = this.releaseTime
+          let days = parseInt(time / 3600 / 24)
+          let hours = parseInt(time / 3600) % 24
+          let seconds = parseInt(time % 60)
+          let minutes = parseInt(time / 60) % 60
+          let timeStr = ''
+          if (days > 0) {
+            timeStr += days + ' 天 '
+          }
+          this.releaseTime = timeStr + hours + ' 时 ' + minutes + ' 分 ' + seconds + ' 秒 '
+        }
+      }, 1000)
+    }
     this.refreshSubmitList()
 
     // if (this.account === null || this.account === undefined) {
@@ -83,13 +128,21 @@ export default {
   },
   methods: {
     viewEffect (answerId, questionId) {
-      let url = 'http://yywebsite.cn/webcheck/#/template'
-      let answerIdStr = '?answer=' + answerId
-      let userStr = '&user=' + window.decodeURIComponent(window.atob(this.account.userid))
-      let questionStr = '&question=' + questionId
-      window.open(url + answerIdStr + userStr + questionStr, '_blank') // 注意第二个参数
-      // window.open('http://yywebsite.cn/webcheck/#/template?answerId=' + answerId + '&userId=' + window.decodeURIComponent(window.atob(this.account.userid)), '_blank') // 注意第二个参数
+      // alert(encodeURI(this.account.userid))
+      // alert(encodeURIComponent(this.account.userid))
 
+      // alert(this.account.username)
+      // alert(this.account.username)
+
+      let url = 'http://yywebsite.cn/webcheck/#/template'
+      // let url = 'http://localhost:8080/#/template'
+      let answerIdStr = '?answer=' + answerId
+      let userStr = '&user=' + encodeURIComponent(this.account.userid)
+      let username = '&name=' + encodeURIComponent(this.account.username)
+
+      let questionStr = '&question=' + questionId
+      window.open(url + answerIdStr + userStr + questionStr + username, '_blank') // 注意第二个参数
+      // window.open('http://yywebsite.cn/webcheck/#/template?answerId=' + answerId + '&userId=' + window.decodeURIComponent(window.atob(this.account.userid)), '_blank') // 注意第二个参数
       // window.open('http://localhost:8081/#/template?answerId=' + answerId + '&userId=' + this.$md5(this.account.userid), '_blank') // 注意第二个参数
     },
     formatTime (str) {
