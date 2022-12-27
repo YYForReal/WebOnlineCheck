@@ -12,12 +12,23 @@ export default {
       studentScript: '',
       checkPoints: [],
       code: '',
-      isQuestion: false
+      isQuestion: false,
+      answerId: null,
+      user: '',
+      username: ''
     }
   },
   mounted () {
     let answerId = this.$route.query.answer || this.$route.query.answerId
+    this.answerId = answerId
     let questionId = this.$route.query.question || this.$route.query.questionId
+    this.user = decodeURIComponent(this.$route.query.user) || this.account.userid
+    this.username = decodeURIComponent(this.$route.query.name) || this.account.username
+
+    window.onbeforeunload = function () {
+      debugger
+    }
+
     if (answerId != null) {
       this.requestStudentCode(answerId)
       // this.requestCheckCode(questionId).then(() => {
@@ -25,11 +36,48 @@ export default {
       // })
     } else {
       this.isQuestion = true
-      console.log('这是问题ID:', questionId)
+      // console.log('这是问题ID:', questionId)
       this.requestQuestionCode(questionId)
     }
   },
   methods: {
+    changeScore () {
+      this.axios({
+        url: this.baseUrl + '/answer/score/default',
+        method: 'post',
+        transformRequest: [(data) => {
+          var oMyForm = new FormData()
+          oMyForm.append('answerId', this.answerId)
+          oMyForm.append('userId', this.user)
+          oMyForm.append('username', this.username)
+          return oMyForm
+        }]
+      }).then((res) => {
+        if (res.data === 'OK') {
+          // console.log('judge success')
+          // this.$message({
+          //   type: 'success',
+          //   message: '评分成功',
+          //   showClose: true
+          // })
+          // this.$emit('changeScore', this.answerId, this.formInline.newScore)
+        } else {
+          // console.log('judge error')
+          // this.$message({
+          //   type: 'error',
+          //   message: '评分失败',
+          //   showClose: true
+          // })
+        }
+      }).catch(err => {
+        this.$message({
+          type: 'error',
+          message: '网络异常',
+          showClose: true
+        })
+        console.log(err)
+      })
+    },
     // requestCheckCode (questionId) {
     //   return new Promise((resolve, reject) => {
     //     this.axios({
@@ -130,7 +178,7 @@ export default {
               let scriptDom = document.createElement('script')
               scriptDom.type = 'text/javascript'
               scriptDom.text = ele
-              console.log('scriptDom:', scriptDom)
+              // console.log('scriptDom:', scriptDom)
               setTimeout(() => {
                 try {
                   bodyDom.appendChild(scriptDom)
@@ -153,38 +201,56 @@ export default {
 
             setTimeout(() => {
               try {
+                let failTip = '代码检测不通过：<br>'
+                let successTip = '代码检测通过<br>'
                 new Promise((resolve, reject) => {
-                  // 在执行校验脚本代码前 提供resolve、reject、this变量
+                  // 在执行校验脚本代码前 提供resolve、reject、this、及学生脚本变量
+
+                  // eslint-disable-next-line no-unused-vars
+                  var studentScript = this.studentScript
                   // eslint-disable-next-line no-unused-vars
                   var that = this
 
                   // eslint-disable-next-line no-eval
                   eval(this.checkPoints[i].code)
                 }).then((value) => {
-                  // console.clear()
                   // 执行成功
-                  this.postResult('代码检测通过<br>' + value).then(() => {
+                  this.postResult(successTip + value).then(() => {
                     console.log(' (Promise)： Post success success')
                     this.$message({
                       type: 'success',
                       message: '代码校验完成'
                     })
+                    this.changeScore()
                   }).catch(() => {
-                    console.log('(Promise)： Post success error')
+                    console.log('(Resolve)： Post success error')
                     this.$message({
                       type: 'error',
                       message: '代码校验失败'
                     })
                   }, (reason) => {
                     // 执行失败
-                    this.postResult('代码检测不通过：<br>' + reason).then(() => {
-                      console.log('(Promise)： Post error success')
-                      this.$message({
-                        type: 'success',
-                        message: '代码校验完成'
-                      })
+                    this.postResult(failTip + reason).then(() => {
+                      console.log('(Reject)： Post 0')
+                      if (reason === '找不到检测的对象') {
+                        this.$message({
+                          type: 'error',
+                          message: '找不到检测的对象，请使用模板，不改id ！！'
+                        })
+                      } else if (reason.indexOf('undefined') !== -1) {
+                        this.$message({
+                          type: 'error',
+                          duration: 5000,
+                          message: '存在undefined。可能原因：“变量未声明”、“函数未提升作用域”或“修改了DOM结构”'
+                        })
+                      } else {
+                        this.$message({
+                          type: 'success',
+                          message: '代码校验完成'
+                        })
+                      }
                     }).catch(() => {
-                      console.log('(Promise)： Post error error')
+                      console.log('(Catch)： Post error error')
                       this.$message({
                         type: 'error',
                         message: '代码校验失败'
@@ -199,12 +265,12 @@ export default {
                       message: '代码校验完成'
                     })
                     console.log('Catch ： Post error success')
-                  }).catch(() => {
+                  }).catch((reason) => {
                     this.$message({
                       type: 'error',
                       message: '代码校验失败'
                     })
-                    console.log('Catch ： Post error error')
+                    console.log('2. Catch ： Post error error')
                   })
                 })
               } catch (e) {

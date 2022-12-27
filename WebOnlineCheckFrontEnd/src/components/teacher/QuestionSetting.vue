@@ -7,8 +7,8 @@
             <el-form-item label="实验标题">
               <span>{{ props.row.title }}</span>
             </el-form-item>
-            <el-form-item label="更新时间">
-              <span>{{ MyFilter.dateFormat(props.row.updateTime) }}</span>
+            <el-form-item label="截止日期">
+              <span>{{ MyFilter.dateFormat(props.row.ddl) }}</span>
             </el-form-item>
             <el-form-item label="展示方式" >
               <span>{{ props.row.display == 1 ? 'iframe' : '图片' }}</span>
@@ -62,6 +62,9 @@
             <el-option label="图片" value="0" checked />
             <el-option label="iframe" value="1" />
           </el-select>
+        </el-form-item>
+        <el-form-item label="截止时间" :label-width="formLabelWidth">
+          <el-date-picker v-model="form.ddl" type="date" placeholder = "该实验的截止日期"   :disabled="form.isDelete"></el-date-picker>
         </el-form-item>
         <el-form-item label="实验说明内容" :label-width="formLabelWidth">
           <el-input v-model="form.description" type="textarea" placeholder = "展示给学生的说明性文本" :rows="8" :disabled="form.isDelete"></el-input>
@@ -126,6 +129,7 @@ export default {
         html: null,
         isDelete: false,
         display: 0,
+        ddl: new Date(),
         description: null,
         example: null
         // attributes: []
@@ -149,6 +153,7 @@ export default {
       this.form.display = 0
       this.form.isDelete = false
       this.form.description = ''
+      this.form.ddl = new Date()
       this.form.example = ''
     },
     handleEdit (index, row) {
@@ -160,6 +165,7 @@ export default {
       this.form.display = row.display
       this.form.isDelete = false
       this.form.description = row.description
+      this.form.ddl = row.ddl
       this.form.example = row.example
     },
     handleDelete (index, row) {
@@ -224,7 +230,7 @@ export default {
             oMyForm.append('html', this.form.html)
             oMyForm.append('description', this.form.description)
             oMyForm.append('example', this.form.example)
-
+            oMyForm.append('ddl', this.form.ddl)
             oMyForm.append('display', this.form.display)
             return oMyForm
           }]
@@ -266,6 +272,7 @@ export default {
             oMyForm.append('html', this.form.html)
             oMyForm.append('description', this.form.description)
             oMyForm.append('example', this.form.example)
+            oMyForm.append('ddl', this.form.ddl)
             oMyForm.append('display', this.form.display)
             return oMyForm
           }]
@@ -330,6 +337,7 @@ export default {
         }
       })
     },
+    // 校验 用户名 + 学号 是否正确
     checkUser () {
       return this.axios({
         url: this.baseUrl + '/user/check',

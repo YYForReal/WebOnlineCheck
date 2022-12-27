@@ -18,7 +18,7 @@
           <el-card class="box-card code-box">
             <el-button-group class="btn-group">
               <el-button type="primary" icon="el-icon-edit"  @click="handleEdit(item)"></el-button>
-              <el-button type="danger" icon="el-icon-delete"  @click="handleDelete(item.codeId)"></el-button>
+              <el-button type="danger" icon="el-icon-delete"  @click="handleDelete(item.codeId,item.questionId)"></el-button>
             </el-button-group>
             <h3>模板HTML</h3>
             <pre><code>{{choosequestion(item.questionId).example}}</code></pre>
@@ -167,13 +167,13 @@ export default {
         }
       })
     },
-    handleDelete (codeId) {
+    handleDelete (codeId, questionId) {
       this.$confirm('是否删除？', '确认信息', {
         distinguishCancelAndClose: true,
         confirmButtonText: '确认',
         cancelButtonText: '放弃删除'
       }).then(() => {
-        this.postDelete(codeId)
+        this.postDelete(codeId, questionId)
       }).catch(() => {
         this.$message({
           type: 'info',
@@ -181,7 +181,7 @@ export default {
         })
       })
     },
-    postDelete (codeId) {
+    postDelete (codeId, questionId) {
       console.log('delte,', codeId)
       this.axios({
         url: this.baseUrl + '/code/delete',
@@ -189,6 +189,7 @@ export default {
         transformRequest: [(data) => {
           var oMyForm = new FormData()
           oMyForm.append('codeId', codeId)
+          oMyForm.append('questionId', questionId)
           return oMyForm
         }]
       }).then((res) => {

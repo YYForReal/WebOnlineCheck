@@ -1,5 +1,5 @@
-div<template>
-  <div class="judge-table">
+<template>
+  <div ref="judgeTable" class="judge-table" @keyup="handleKeyupEvent">
     <div class="box">
       <h2>筛选栏</h2>
       <el-form :inline="true" ref="questionForm" :model="form" label-position="left" label-width="0px"
@@ -21,7 +21,7 @@ div<template>
         </el-form-item>
         <el-button type="info" round @click="compareSettingVisible = true">截图配置</el-button>
         <el-button type="primary" icon="el-icon-search" round @click="refreshAnswerList">搜索</el-button>
-        <el-button type="primary" round @click="refreshCSVData">导出提交列表</el-button>
+        <el-button type="primary" round @click="refreshCSVData" v-loading="waiting">导出成绩</el-button>
       </el-form>
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage"
         :page-sizes="pageSizes" :page-size="PageSize" layout="total, sizes, prev, pager, next, jumper"
@@ -34,24 +34,33 @@ div<template>
     </div> -->
     <div class="student-submit-box">
       <h3>学生提交</h3>
-      <div class="one-box" v-for="(item, i) in showAnswerList.slice((currentPage - 1) * PageSize, currentPage * PageSize)"
-        :key="item.answerId">
-
-        <!-- :questionText="chooseQuestionText(item.questionId)"
-          :questionTitle="chooseQuestionTitle(item.questionId)"
-
-           -->
-        <JudgeVue :answerId="item.answerId" :content="item.content" :score="item.score"
-          :userId="item.userId" :username="item.username"
-          :updateTime="item.updateTime" :questionId="item.questionId" :basePicUrl2="chooseAnsPicUrl(item.questionId)"
-          :question="chooseQuestion(item.questionId)"
-          :compareSetting="compareSetting" :autoCompare="(autoCompare && canCompareNumber >= i)"
+      <div class="one-box"
+        v-for="(item, i) in showAnswerList.slice((currentPage - 1) * PageSize, currentPage * PageSize)"
+        :key="item.updateTime">
+        <!--
+代码精简：传入一个对象后可以使得原本传入的几个参数都整合到一起。
+  :answerId="item.answerId"
+  :content="item.content"
+  :score="item.score"
+  :userId="item.userId"
+  :username="item.username"
+  :questionId="item.questionId"
+  :updateTime="item.updateTime"
+-->
+        <JudgeVue :answer="item" :basePicUrl2="chooseAnsPicUrl(item.questionId)"
+          :question="chooseQuestion(item.questionId)" :compareSetting="compareSetting"
+          :autoCompare="(autoCompare && canCompareNumber >= i)" :autoCache="autoCache" :focusDom="(focusDomNumber == i)"
           @changeScore="changeScore" @completeCompare="completeCompare" />
       </div>
     </div>
+    <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage"
+      :page-sizes="pageSizes" :page-size="PageSize" layout="total, sizes, prev, pager, next, jumper"
+      :total="totalCount">
+    </el-pagination>
     <!-- :before-close="handleClose" -->
     <el-dialog title="截图配置" :visible.sync="compareSettingVisible" width="50%">
       <el-form>
+        <!-- <div style="width:100%;display:flex;"> -->
         <el-form-item label="一键比对">
           <el-switch v-model="autoCompare" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
         </el-form-item>
@@ -59,13 +68,20 @@ div<template>
           <el-input type="number" v-model="compareSetting.width" placeholder="图像宽度"
             @keyup.enter.native="compareSettingVisible = false"></el-input>
         </el-form-item>
-        <el-form-item label="模拟浏览器高度（单位：px）" >
+        <el-form-item label="模拟浏览器高度（单位：px）">
           <el-input type="number" v-model="compareSetting.height" placeholder="图像高度"
             @keyup.enter.native="compareSettingVisible = false"></el-input>
         </el-form-item>
         <el-form-item label="延迟截图时间（单位：ms） （若截图显示空白可调高）">
           <el-input type="number" v-model="compareSetting.delay" placeholder="延迟时间"
             @keyup.enter.native="compareSettingVisible = false"></el-input>
+        </el-form-item>
+        <el-form-item label="使用缓存图片">
+          <el-switch v-model="autoCache" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+        </el-form-item>
+        <el-form-item label="取消参考比对(提升性能用)">
+          <el-switch v-model="compareSetting.compareShowFlag" active-color="#13ce66"
+            inactive-color="#ff4949"></el-switch>
         </el-form-item>
         <!-- <el-form-item label="是否使用Iframe查看（针对CSS动画）">
           <el-switch v-model="compareSetting.visitType" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
@@ -100,15 +116,18 @@ export default {
 
       // 图像比对数据
       autoCompare: false,
+      autoCache: true,
       compareAnswerNumber: 0, // 当前比较的参考运行截图序号
       canCompareNumber: 0, // 当前比较的运行截图序号
+      focusDomNumber: 0, // 当前比较的序号
       isSending: false,
       canAskQuestionPic: false,
       compareSetting: {
         width: 1024,
         height: 960,
         delay: 500,
-        visitType: false
+        visitType: false,
+        compareShowFlag: true // 是否显示参考比对的部分
       },
       compareSettingVisible: false,
 
@@ -120,7 +139,8 @@ export default {
       PageSize: 10,
 
       // 导出数据
-      csvData: null
+      csvData: null,
+      waiting: false
     }
   },
   created () {
@@ -132,8 +152,30 @@ export default {
       }
     }, 500)
   },
+  mounted () {
+    // this.$refs.judgeTable.onkeydown = (a, b) => {
+    //   console.log(a, b)
+    // }
+  },
   methods: {
+    // 处理键盘事件
+    handleKeyupEvent (event) {
+      // console.log(event)
+      if (event.code === 'Slash') {
+        if (this.focusDomNumber === this.PageSize) {
+          this.focusDomNumber = -1
+        }
+        this.focusDomNumber++
+      } else if (event.code === 'NumpadSubtract') {
+        this.focusDomNumber--
+        if (this.focusDomNumber < 0) {
+          this.focusDomNumber = 0
+        }
+      }
+    },
+    // 获取CSV数据
     refreshCSVData () {
+      this.waiting = true
       this.axios({
         url: this.baseUrl + '/user/get/submit-list',
         method: 'get'
@@ -142,8 +184,10 @@ export default {
         // this.canAskQuestionPic = true
         // console.log('csv数据列表：', this.csvData)
         this.exportCSV()
+        this.waiting = false
         // this.askPictureUrl()
       }).catch((err) => {
+        this.waiting = false
         console.log('request /question/get: ', err)
       })
     },
@@ -170,7 +214,8 @@ export default {
           if (this.csvData.answers[userIndex].userId > userId) {
             break
           } else {
-            rowArr[hashMap.get(this.csvData.answers[userIndex].questionId)] = 1
+            rowArr[hashMap.get(this.csvData.answers[userIndex].questionId)] = Math.max(1, parseInt(this.csvData.answers[userIndex].score))
+            // rowArr[hashMap.get(this.csvData.answers[userIndex].questionId)] = 1
           }
           userIndex++
         }
@@ -200,13 +245,23 @@ export default {
       // 注意：在改变每页显示的条数时，要将页码显示到第一页
       this.currentPage = 1
       this.canCompareNumber = 0
+      this.focusDomNumber = 0
     },
     // 显示第几页
     handleCurrentChange (val) {
       // 改变默认的页数
       this.currentPage = val
       this.canCompareNumber = 0
+      this.focusDomNumber = 0
+
+      // let timer = setInterval(() => {
+      //   if (document.body.clientHeight > 0) {
+      //   } else {
+      //     clearInterval(timer)
+      //   }
+      // }, 50)
     },
+
     // 通过ID选择对应的参考图片
     chooseAnsPicUrl (questionId) {
       // console.log('choise ans:', this.ansPicUrls)
@@ -433,6 +488,7 @@ export default {
     'form.questionIds': {
       handler (val) {
         console.log('newIds', val)
+        this.handleCurrentChange(1)
         if (val == null || val.length === 0) { return }
         if (this.form.timer != null) {
           clearTimeout(this.form.timer)
@@ -465,6 +521,7 @@ export default {
     autoCompare: {
       handler () {
         this.canCompareNumber = 0
+        this.focusDomNumber = 0
         if (this.questionList.length === 0 && this.isSending === false) {
           this.refreshQuestionList()
           this.isSending = true
