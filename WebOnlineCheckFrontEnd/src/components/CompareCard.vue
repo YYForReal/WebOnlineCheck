@@ -9,15 +9,18 @@
     <table class="comp-card">
       <tr class="table-header">
         <td v-if="question.example != null" class="td-text">
-          <el-popover placement="bottom-start" title="JS代码" width="500" trigger="hover"
-            :content="filterJS(content)">
+          <el-popover placement="bottom-start" title="JS代码" width="500" trigger="hover" :content="filterJS(content)">
             <span slot="reference">JS校验结果(悬浮查看代码)</span>
           </el-popover>
 
         </td>
         <td v-else class="td-text"><a @click="dialogVisiable = true"
             style="text-decoration:underline;cursor:pointer">比对结果</a></td>
-        <td class="td-pic">{{ visitType === 1 ? '参考运行窗口' : '参考运行截图' }} </td>
+        <td class="td-pic" :class="{ 'td-none-js': visitType == 1 && compareSetting.compareShowFlag == false }">{{
+            visitType
+              === 1 ?
+              '参考运行窗口' : '参考运行截图'
+        }} </td>
         <td class="td-pic" @click="showBigIframe()"><a>{{ visitType === 1 ? '运行窗口(点击放大)' : '运行截图(点我放大)' }}</a></td>
       </tr>
       <tr class="table-content">
@@ -25,9 +28,18 @@
         <td v-else class="td-text">
           <div ref="result" v-html="resultHtml"></div>
         </td>
-        <td v-if="visitType === 1">
-          <iframe ref="qiframe" sandbox='allow-scripts allow-same-origin'
+
+        <td v-if="(visitType === 1)"
+          :class="{ 'td-none-js': visitType == 1 && compareSetting.compareShowFlag == false }">
+          <iframe v-if="(compareSetting.compareShowFlag == true)" ref="qiframe"
+            sandbox='allow-scripts allow-same-origin'
             :src="'http://yywebsite.cn/webcheck/#/template?question=' + question.questionId"></iframe>
+          <div v-else>
+            <div>
+              <p>已取消参考比对JS实验。</p>
+              <p>可通过上方截图配置还原。</p>
+            </div>
+          </div>
         </td>
         <td v-else v-loading="!comparePic">
           <el-popover placement="top-start" trigger="click">
@@ -106,12 +118,14 @@ export default {
       let reg = /<script[^>]*>([^<]|<(?!\/script))*<\/script>/gmi
       let res = str.match(reg)
       let JSCode = ''
-      res.forEach((ele) => {
-        let startIndex = ele.indexOf('>')
-        let endIndex = ele.lastIndexOf('<')
-        ele = ele.slice(startIndex + 1, endIndex)
-        JSCode += ele
-      })
+      if (res != null) {
+        res.forEach((ele) => {
+          let startIndex = ele.indexOf('>')
+          let endIndex = ele.lastIndexOf('<')
+          ele = ele.slice(startIndex + 1, endIndex)
+          JSCode += ele
+        })
+      }
       return JSCode
     },
     showBigIframe () {
@@ -177,7 +191,6 @@ export default {
     },
     showHtml () {
       // this.$refs.iframe.src = this.content
-      const qiframe = this.$refs.qiframe
       const iframe = this.$refs.iframe
       const bigIframe = this.$refs.bigIframe
 
@@ -188,9 +201,6 @@ export default {
       idoc.open()
       idoc.write(this.filterScript(this.content))
       idoc.close()
-
-      // 为了同步，同时注入src到问题的参考iframe
-      qiframe.src = 'http://yywebsite.cn/webcheck/#/template?questionId=' + this.question.questionId
 
       if (bigIframe == null) return
       iwindow = bigIframe.contentWindow
@@ -214,6 +224,14 @@ export default {
     }
   },
   props: {
+    compareSetting: {
+      type: Object,
+      default () {
+        return {
+          compareShowFlag: true
+        }
+      }
+    },
     visitType: {
       type: Number,
       default: 0
@@ -258,6 +276,16 @@ export default {
       setTimeout(() => {
         this.showHtml()
       }, 500)
+    },
+    compareSetting: {
+      handler (value) {
+        const qiframe = this.$refs.qiframe
+        // 为了同步，同时注入src到问题的参考iframe
+        if (value.compareShowFlag === true && this.visitType === 1) {
+          qiframe.src = 'http://yywebsite.cn/webcheck/#/template?questionId=' + this.question.questionId
+        }
+      },
+      deep: true
     }
   },
   computed: {
@@ -319,6 +347,13 @@ export default {
 
 .comp-card .table-header .td-pic {
   min-width: 350px;
+  transition: all 1s;
+}
+
+.comp-card .table-header .td-none-js {
+  width: 12% !important;
+  min-width: auto;
+  max-width: 300px;
 }
 
 .comp-card>>>.table-one-header {
@@ -348,6 +383,12 @@ export default {
 .table-content td {
   width: 38%;
   height: 300px;
+}
+
+.table-content .td-none-js {
+  width: 50px;
+  min-width: auto;
+  max-width: 300px;
 }
 
 /* 缩方iframe的内容 */

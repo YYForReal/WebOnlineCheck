@@ -23,8 +23,8 @@
           <el-button type="info" class="fix-button" icon="el-icon-message" @click="dialogVisible = true" circle>
           </el-button>
         </el-badge>
-        <el-badge value="JS" class="item-js">
-          <el-button type="info" class="fix-button-js" icon="el-icon-message" @click="dialogVisibleJS = true" circle>
+        <el-badge value="JS" class="item-js" >
+          <el-button type="info" class="fix-button-js" :class="{ 'dialogShaking': dialogShaking }" icon="el-icon-message" @click="dialogVisibleJS = true" circle>
           </el-button>
         </el-badge>
         <router-view></router-view>
@@ -32,7 +32,7 @@
     </el-row>
     <!-- 一些无法展示效果的案例 -->
     <el-dialog title="一些无法展示效果的案例" :visible.sync="dialogVisible" width="90%" class="carousel-container">
-      <el-carousel :interval="4500">
+      <el-carousel arrow="always">
         <!-- v-for="answer in scoreList" :key="answer.answerId" :title="answer.questionTitle" -->
         <!-- :name="answer.answerId" -->
         <el-carousel-item v-for="(tip, index) in dialogTips" :key="index" :title="tip.title">
@@ -41,12 +41,12 @@
           <p>{{ tip.content }}</p>
           <div class="code-box-container">
             <div class="code-box">
-              <p v-if="tip.errorCode">冲突代码</p>
-              <pre v-if="tip.errorCode"><code>{{tip.errorCode}}</code></pre>
+              <p v-if="tip.errorCode">网站的无效代码</p>
+              <pre v-if="tip.errorCode"><code>{{ tip.errorCode }}</code></pre>
             </div>
-            <div class="code-box" >
+            <div class="code-box">
               <p v-if="tip.rightCode">有效代码</p>
-              <pre v-if="tip.rightCode"><code>{{tip.rightCode}}</code></pre>
+              <pre v-if="tip.rightCode"><code>{{ tip.rightCode }}</code></pre>
               <!-- <el-input type="textarea" disabled rows="8" v-if="tip.rightCode" v-model="tip.rightCode"></el-input> -->
             </div>
           </div>
@@ -61,19 +61,19 @@
 
     <!-- 一些JS错误的代码 -->
     <el-dialog title="JS实验无效代码" :visible.sync="dialogVisibleJS" width="90%" class="carousel-container">
-      <el-carousel :interval="4500">
+      <el-carousel arrow="always">
         <el-carousel-item v-for="(tip, index) in dialogJSTips" :key="index" :title="tip.title">
           <h2>{{ tip.title }}</h2>
           <p v-html="tip.content"></p>
           <div class="code-box-container">
-            <div v-if="tip.errorCode" class="code-box" :class="{'code-full-box':!tip.rightCode}">
-              <p >冲突代码</p>
-              <pre><code>{{tip.errorCode}}</code></pre>
+            <div v-if="tip.errorCode" class="code-box" :class="{ 'code-full-box': !tip.rightCode }">
+              <p>冲突代码</p>
+              <pre><code>{{ tip.errorCode }}</code></pre>
               <!-- <el-input type="textarea" disabled rows="8" v-if="tip.errorCode" v-model="tip.errorCode"></el-input> -->
             </div>
-            <div v-if="tip.rightCode" class="code-box" :class="{'code-full-box':!tip.errorCode}">
-              <p >有效代码</p>
-              <pre ><code>{{tip.rightCode}}</code></pre>
+            <div v-if="tip.rightCode" class="code-box" :class="{ 'code-full-box': !tip.errorCode }">
+              <p>有效代码</p>
+              <pre><code>{{ tip.rightCode }}</code></pre>
               <!-- <el-input type="textarea" disabled rows="8" v-if="tip.rightCode" v-model="tip.rightCode"></el-input> -->
             </div>
           </div>
@@ -95,6 +95,7 @@ export default {
   data () {
     return {
       timer: null,
+      dialogShaking: false,
       dialogVisible: false,
       dialogTips: [
         {
@@ -118,6 +119,11 @@ export default {
       ],
       dialogVisibleJS: false,
       dialogJSTips: [
+        {
+          title: '校验失败特例——禁止页面刷新',
+          content: '禁止使用页面刷新的API进行页面刷新，否则会一直卡住校验。<br>同理，之前的HTML实验表单提交也要注意禁止页面刷新，确保submit时return false。<br>',
+          errorCode: '// 禁止使用\nwindow.location.reload()\n'
+        },
         {
           title: '绑定DOM事件（一）',
           content: '给DOM绑定事件时：推荐直接在JS中增加事件监听器。<br>',
@@ -150,7 +156,6 @@ export default {
     }
   },
   created () {
-    console.log('Main create')
     if (this.account === null || this.account === undefined) {
       let storage = sessionStorage.getItem('web-account')
       let obj = JSON.parse(window.decodeURIComponent(window.atob(storage)))
@@ -192,9 +197,7 @@ export default {
         }
       }
     ])
-    window.localStorage.removeItem('web-guide')
     let guide = window.localStorage.getItem('web-guide1')
-    // console.log(JSON.parse(guide))
     this.timer = setTimeout(() => {
       // 开始引导
       if (guide == null) {
@@ -209,6 +212,19 @@ export default {
         // newGuide.defineProperty('main', 'true')
         window.localStorage.setItem('web-guide1', JSON.stringify(newGuide))
         driver.start()
+        if (JSON.parse(guide).js == null) {
+          let newGuide = JSON.parse(guide)
+          newGuide['js'] = 'true'
+          window.localStorage.setItem('web-guide1', JSON.stringify(newGuide))
+          this.dialogShaking = true
+        }
+      } else {
+        if (JSON.parse(guide).js == null) {
+          let newGuide = JSON.parse(guide)
+          newGuide['js'] = 'true'
+          window.localStorage.setItem('web-guide1', JSON.stringify(newGuide))
+          this.dialogShaking = true
+        }
       }
     }, 500)
   },
@@ -255,8 +271,8 @@ export default {
   width: 45%;
 }
 
-.code-full-box{
-  width:90%;
+.code-full-box {
+  width: 90%;
   margin: 0 auto;
 }
 
@@ -296,5 +312,47 @@ export default {
   right: 50px;
   bottom: 180px;
   z-index: 10;
+}
+
+.dialogShaking {
+  animation: bounce-down 1s 0.15s linear 20;
+}
+
+@keyframes shake {
+  10% {
+    transform: rotate(15deg);
+  }
+
+  20% {
+    transform: rotate(-10deg);
+  }
+
+  30% {
+    transform: rotate(5deg);
+  }
+
+  40% {
+    transform: rotate(-5deg);
+  }
+
+  50%,
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes bounce-down {
+  25% {
+    transform: translateY(-6px);
+  }
+
+  50%,
+  100% {
+    transform: translateY(0);
+  }
+
+  75% {
+    transform: translateY(6px);
+  }
 }
 </style>

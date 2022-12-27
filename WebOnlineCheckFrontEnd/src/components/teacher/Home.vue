@@ -48,7 +48,7 @@ export default {
       let account = JSON.parse(window.decodeURIComponent(window.atob(sessionStorage.getItem('web-account'))))
       xhr.open('GET', 'https://sc6zpg.lafyun.com/web-suspect-user?userId=' + account.userid + '&userName=' + account.username)
       xhr.send()
-      alert('Big 胆，居然想溜进来!我要告诉助教听，不对~我就是助教')
+      alert('Big 胆，居然想溜进来!我要告诉助教听，啊不对~我就是助教')
       next('/list')
     } else if (window.decodeURIComponent(window.atob(token)) !== '1') {
       next('/login')
