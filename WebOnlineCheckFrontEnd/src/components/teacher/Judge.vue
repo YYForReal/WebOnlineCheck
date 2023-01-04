@@ -36,15 +36,21 @@
           <el-button type="primary" @click="picCompare">比对刷新</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="viewEffect">查看效果</el-button>
+          <el-button type="primary" @click="viewEffect">校验效果</el-button>
         </el-form-item>
-        <p class="form-span" :class="{'delay-submit':answer.updateTime>question.ddl}">{{ formatTime(answer.updateTime) }}</p>
+        <el-form-item>
+          <el-button type="primary" @click="viewOriginalEffect">原生效果</el-button>
+        </el-form-item>
+
+        <p class="form-span" :class="{ 'delay-submit': answer.updateTime > question.ddl }">{{
+          formatTime(answer.updateTime)
+        }}</p>
 
       </el-form>
     </div>
     <CompareCard :visitType="question.display == 1 ? 1 : 0" :content="answer.content" :questionText="question.content"
       :comparePic="basePicUrl2" :runningPic="basePicUrl" :isLoading="isLoading" :question="question"
-      :JSCheckResult="JSCheckResult" ref="compCard"  :compareSetting="compareSetting" />
+      :JSCheckResult="JSCheckResult" ref="compCard" :compareSetting="compareSetting" />
   </el-card>
 </template>
 
@@ -85,6 +91,10 @@ export default {
 
     formatTime (time) {
       return MyFilter.dateFormat(time)
+    },
+    viewOriginalEffect () {
+      const newWindow = window.open()
+      newWindow.document.write(this.answer.content)
     },
     viewEffect () {
       let url = 'http://yywebsite.cn/webcheck/#/template'
@@ -389,7 +399,7 @@ export default {
       deep: true
     },
     question: {
-      handler: function () {},
+      handler: function () { },
       deep: true
     },
     // score: function (val) {
@@ -517,7 +527,7 @@ export default {
 }
 
 /* 迟交的人特殊标记一下提交日期 */
-.delay-submit{
-  color:red;
+.delay-submit {
+  color: red;
 }
 </style>

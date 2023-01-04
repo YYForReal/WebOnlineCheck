@@ -19,9 +19,9 @@
           <el-input type="text" v-model="form.userId" placeholder="学号（回车搜索）" @keyup.enter.native="refreshAnswerList">
           </el-input>
         </el-form-item>
-        <el-button type="info" round @click="compareSettingVisible = true">截图配置</el-button>
+        <el-button type="info" round @click="compareSettingVisible = true" icon="el-icon-setting">配置</el-button>
         <el-button type="primary" icon="el-icon-search" round @click="refreshAnswerList">搜索</el-button>
-        <el-button type="primary" round @click="refreshCSVData" v-loading="waiting">导出成绩</el-button>
+        <el-button type="primary" round @click="refreshCSVData" v-loading="waiting" icon="el-icon-document">导出成绩</el-button>
       </el-form>
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage"
         :page-sizes="pageSizes" :page-size="PageSize" layout="total, sizes, prev, pager, next, jumper"
@@ -58,7 +58,7 @@
       :total="totalCount">
     </el-pagination>
     <!-- :before-close="handleClose" -->
-    <el-dialog title="截图配置" :visible.sync="compareSettingVisible" width="50%">
+    <el-dialog title="配置" :visible.sync="compareSettingVisible" width="50%">
       <el-form>
         <!-- <div style="width:100%;display:flex;"> -->
         <el-form-item label="一键比对">
@@ -83,6 +83,7 @@
           <el-switch v-model="compareSetting.compareShowFlag" active-color="#13ce66"
             inactive-color="#ff4949"></el-switch>
         </el-form-item>
+
         <!-- <el-form-item label="是否使用Iframe查看（针对CSS动画）">
           <el-switch v-model="compareSetting.visitType" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
         </el-form-item> -->
